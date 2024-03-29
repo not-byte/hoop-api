@@ -1,16 +1,23 @@
 package main
 
 import (
+	"flag"
 	"fmt"
+	"log"
 	"net/http"
+	"tournament_api/server/api"
+	"tournament_api/server/store"
 )
 
-func hello(w http.ResponseWriter, req *http.Request) {
-	fmt.Fprintf(w, "Hello, world!\n")
-}
-
 func main() {
-	http.HandleFunc("/", hello)
 
-	http.ListenAndServe(":80", nil)
+	listenAddr := flag.String("listenaddr", ":3000", "the server address")
+
+	store := store.NewSQLStore()
+	server := api.NewServer(*listenAddr, store)
+	fmt.Println("server running on:", *listenAddr)
+	log.Fatal(server.Start())
+
+	port := ":8080"
+	http.ListenAndServe(port, nil)
 }
