@@ -3,21 +3,19 @@ package config
 import (
 	"encoding/json"
 	"fmt"
-	"go/types"
-	"log"
 	"os"
+	"tournament_api/server/types"
 )
 
-func LoadConfig() (*types.Config, error) {
-	var config types.Config
+func LoadConfig() (*types.AppConfig, error) {
+	var config types.AppConfig
 
 	env := os.Getenv("ENV")
 	if env == "" {
 		env = "dev"
 	}
-	cwd, _ := os.Getwd()
-	log.Println("Current Working Directory:", cwd)
 
+	//this might be later changed to relative path
 	configFile, err := os.Open(fmt.Sprintf("server/config/config.%s.json", env))
 
 	if err != nil {

@@ -1,14 +1,14 @@
 package store
 
 import (
-	"go/types"
+	"tournament_api/server/types"
 
 	_ "github.com/lib/pq"
 )
 
 type SQLStore struct{}
 
-func NewSQLStore(config *types.Config) *SQLStore {
+func NewSQLStore(config *types.AppConfig) *SQLStore {
 	/*
 
 		psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+

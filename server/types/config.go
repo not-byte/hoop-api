@@ -1,6 +1,6 @@
 package types
 
-type Config struct {
+type AppConfig struct {
 	DbUser      string `json:"dbUser"`
 	DbPassword  string `json:"dbPass"`
 	DbHost      string `json:"dbHost"`
