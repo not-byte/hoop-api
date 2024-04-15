@@ -9,17 +9,10 @@ import (
 )
 
 func (s *Server) handleGetAll(w http.ResponseWriter, r *http.Request) {
-
 	json.NewEncoder(w).Encode("siema")
-
 }
+
 func (s *Server) handleLogin(w http.ResponseWriter, r *http.Request) {
-
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
-	w.Header().Set("Access-Control-Allow-Credentials", "true")
-
 	//find if user exsits
 	//create a new user in db
 
