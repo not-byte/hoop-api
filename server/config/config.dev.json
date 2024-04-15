@@ -1,0 +1,6 @@
+{
+    "dbUser": "devuser",
+    "dbPass": "devpass",
+    "dbHost": "localhost",
+    "environment": "development"
+}
