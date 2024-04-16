@@ -1,6 +1,0 @@
-{
-    "dbUser": "produser",
-    "dbPass": "prodsecret",
-    "dbHost": "prod.database.example.com",
-    "environment": "production"
-  }

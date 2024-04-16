@@ -1,8 +1,13 @@
 package types
 
 type AppConfig struct {
-	DbUser      string `json:"dbUser"`
-	DbPassword  string `json:"dbPass"`
-	DbHost      string `json:"dbHost"`
-	Environment string `json:"environment"`
+	Production             bool
+	PublicHost             string
+	Port                   string
+	DBUser                 string
+	DBPassword             string
+	DBAddress              string
+	DBName                 string
+	JWTSecret              string
+	JWTExpirationInSeconds int64
 }

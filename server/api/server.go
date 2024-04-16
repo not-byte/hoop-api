@@ -25,7 +25,7 @@ func NewServer(listenAddr string, store store.Store, config *types.AppConfig) *S
 func (s *Server) Start() error {
 	rootRouter := mux.NewRouter()
 	rootRouter.Use(APIKeyMiddleware)
-	if s.config.Environment == "development" {
+	if !s.config.Production {
 		rootRouter.Use(CORSmiddleware)
 	}
 	rootRouter.HandleFunc("/", s.handleGetAll)

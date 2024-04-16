@@ -8,7 +8,7 @@ import (
 const API_KEY = "API KEY"
 const EXPECTED_API_KEY = "MY API KEY"
 
-func Authenticate(next http.Handler) http.Handler {
+func authenticate(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		accessTokenString, accessTokenErr := r.Cookie(ACCESS_TOKEN)
 		refreshTokenString, refreshTokenErr := r.Cookie(REFRESH_TOKEN)
@@ -40,7 +40,7 @@ func Authenticate(next http.Handler) http.Handler {
 	})
 }
 
-func TokenRefreshMiddleware(next http.Handler) http.Handler {
+func tokenRefreshMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		accessTokenString, accessTokenErr := r.Cookie(ACCESS_TOKEN)
 		refreshTokenString, refreshTokenErr := r.Cookie(REFRESH_TOKEN)

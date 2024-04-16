@@ -36,13 +36,8 @@ func (s *Server) handleLogin(w http.ResponseWriter, r *http.Request) {
 	accessTokenString, errAccess := accessToken.generateTokenString(user.FirstName, user.LastName)
 	refreshTokenString, errRefresh := refreshToken.generateTokenString(user.FirstName, user.LastName)
 
-	if errAccess != nil {
-		http.Error(w, "Error generating access token string", http.StatusInternalServerError)
-		return
-	}
-
-	if errRefresh != nil {
-		http.Error(w, "Error generating refresh token string", http.StatusInternalServerError)
+	if errAccess != nil || errRefresh != nil {
+		http.Error(w, "Error generating token string", http.StatusInternalServerError)
 		return
 	}
 

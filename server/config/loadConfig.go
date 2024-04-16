@@ -1,34 +1,60 @@
 package config
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
+	"strconv"
 	"tournament_api/server/types"
+
+	"github.com/joho/godotenv"
 )
 
 func LoadConfig() (*types.AppConfig, error) {
-	var config types.AppConfig
+	godotenv.Load()
 
-	env := os.Getenv("ENV")
-	if env == "" {
-		env = "dev"
+	config := &types.AppConfig{
+		Production:             getEnvAsBool("PRODUCTION", false),
+		PublicHost:             getEnv("PUBLIC_HOST", "http://localhost"),
+		Port:                   getEnv("PORT", "8080"),
+		DBUser:                 getEnv("DB_USER", "root"),
+		DBPassword:             getEnv("DB_PASSWORD", "mypassword"),
+		DBAddress:              fmt.Sprintf("%s:%s", getEnv("DB_HOST", "127.0.0.1"), getEnv("DB_PORT", "3306")),
+		DBName:                 getEnv("DB_NAME", "ecom"),
+		JWTSecret:              getEnv("JWT_SECRET", "not-so-secret-now-is-it?"),
+		JWTExpirationInSeconds: getEnvAsInt("JWT_EXPIRATION_IN_SECONDS", 3600*24*7),
 	}
 
-	//this might be later changed to relative path
-	configFile, err := os.Open(fmt.Sprintf("server/config/config.%s.json", env))
+	return config, nil
+}
 
-	if err != nil {
-		return nil, err
+func getEnvAsInt(key string, fallback int64) int64 {
+	if value, ok := os.LookupEnv(key); ok {
+		i, err := strconv.ParseInt(value, 10, 64)
+		if err != nil {
+			return fallback
+		}
+
+		return i
 	}
 
-	defer configFile.Close()
-	decoder := json.NewDecoder(configFile)
-	err = decoder.Decode(&config)
+	return fallback
+}
 
-	if err != nil {
-		return nil, err
+func getEnvAsBool(key string, fallback bool) bool {
+	if value, ok := os.LookupEnv(key); ok {
+		b, err := strconv.ParseBool(value)
+		if err != nil {
+			return fallback
+		}
+		return b
+	}
+	return fallback
+}
+
+func getEnv(key, fallback string) string {
+	if value, ok := os.LookupEnv(key); ok {
+		return value
 	}
 
-	return &config, nil
+	return fallback
 }
