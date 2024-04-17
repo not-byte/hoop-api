@@ -1,7 +1,6 @@
 package config
 
 import (
-	"fmt"
 	"os"
 	"strconv"
 	"tournament_api/server/types"
@@ -13,15 +12,18 @@ func LoadConfig() (*types.AppConfig, error) {
 	godotenv.Load()
 
 	config := &types.AppConfig{
-		Production:             getEnvAsBool("PRODUCTION", false),
-		PublicHost:             getEnv("PUBLIC_HOST", "http://localhost"),
-		Port:                   getEnv("PORT", "8080"),
-		DBUser:                 getEnv("DB_USER", "root"),
-		DBPassword:             getEnv("DB_PASSWORD", "mypassword"),
-		DBAddress:              fmt.Sprintf("%s:%s", getEnv("DB_HOST", "127.0.0.1"), getEnv("DB_PORT", "3306")),
-		DBName:                 getEnv("DB_NAME", "ecom"),
-		JWTSecret:              getEnv("JWT_SECRET", "not-so-secret-now-is-it?"),
-		JWTExpirationInSeconds: getEnvAsInt("JWT_EXPIRATION_IN_SECONDS", 3600*24*7),
+		PRODUCTION:                        getEnvAsBool("PRODUCTION", false),
+		PUBLIC_HOST:                       getEnv("PUBLIC_HOST", "http://localhost"),
+		PORT:                              getEnv("PORT", ":8080"),
+		DB_USER:                           getEnv("DB_USER", "root"),
+		DB_PASSWORD:                       getEnv("DB_PASSWORD", ""),
+		DB_HOST:                           getEnv("DB_HOST", "eu2.notbyte.com"),
+		DB_PORT:                           getEnv("DB_PORT", "60009"),
+		DB_NAME:                           getEnv("DB_NAME", "tournament_dev"),
+		JWT_ACCESS_SECRET:                 getEnv("JWT_ACCESS_SECRET", "not-so-secret-now-is-it?"),
+		JWT_REFRESH_SECRET:                getEnv("JWT_REFRESH_SECRET", "not-so-secret-now-is-it?"),
+		JWT_ACCESS_EXPIRATION_IN_SECONDS:  getEnvAsInt("JWT_ACCESS_EXPIRATION_IN_SECONDS", 600),         //12 minutes
+		JWT_REFRESH_EXPIRATION_IN_SECONDS: getEnvAsInt("JWT_REFRESH_EXPIRATION_IN_SECONDS", 3600*24*14), //14 days
 	}
 
 	return config, nil

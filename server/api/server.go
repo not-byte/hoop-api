@@ -24,8 +24,10 @@ func NewServer(listenAddr string, store store.Store, config *types.AppConfig) *S
 
 func (s *Server) Start() error {
 	rootRouter := mux.NewRouter()
-	rootRouter.Use(APIKeyMiddleware)
-	if !s.config.Production {
+	if s.config.PRODUCTION {
+		rootRouter.Use(APIKeyMiddleware)
+	}
+	if !s.config.PRODUCTION {
 		rootRouter.Use(CORSmiddleware)
 	}
 	rootRouter.HandleFunc("/", s.handleGetAll)
