@@ -16,7 +16,7 @@ database schema
 
 redis cache
 
-# Service
+### Service
 
 golang rest api
 
@@ -41,7 +41,6 @@ kubernetes
 99.9% availability
 
 ## Service Design
-The markdown has been updated to include the seed script and the views for the database schema:
 
 ## Database Schema
 
