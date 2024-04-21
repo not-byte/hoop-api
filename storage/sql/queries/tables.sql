@@ -2,7 +2,7 @@ DROP DATABASE IF EXISTS tournament_dev CASCADE;
 
 CREATE DATABASE IF NOT EXISTS tournament_dev;
 
-USE DATABASE tournament_dev;
+USE tournament_dev;
 
 CREATE TYPE IF NOT EXISTS position_enum AS ENUM ('PG', 'SG', 'SF', 'PF', 'C');
 CREATE TYPE IF NOT EXISTS account_enum AS ENUM ('PLAYER', 'REFEREE', 'ADMIN');
@@ -11,7 +11,7 @@ CREATE TYPE IF NOT EXISTS gender_enum AS ENUM ('MALE', 'FEMALE');
 
 CREATE TABLE IF NOT EXISTS permissions (
     id BIGINT NOT NULL UNIQUE DEFAULT unique_rowid() PRIMARY KEY,
-    type account_enum NOT NULL DEFAULT 'player',
+    type account_enum NOT NULL DEFAULT 'PLAYER',
     flags BIT(8) NOT NULL DEFAULT B'00000000'
 );
 
@@ -54,6 +54,7 @@ CREATE TABLE IF NOT EXISTS categories (
     name TEXT NOT NULL,
     gender gender_enum NOT NULL,
     team_limit INT NOT NULL DEFAULT 0,
+    UNIQUE (name, gender),
     INDEX categories_name (name)
 );
 
@@ -62,7 +63,7 @@ CREATE TABLE IF NOT EXISTS teams (
     cities_id BIGINT DEFAULT NULL REFERENCES cities (id) ON DELETE CASCADE,
     categories_id BIGINT DEFAULT NULL REFERENCES categories (id) ON DELETE CASCADE,
     name TEXT NOT NULL UNIQUE,
-    description TEXT NOT NULL,
+    description TEXT DEFAULT NULL,
     gender gender_enum NOT NULL,
     created_on TIMESTAMP NOT NULL DEFAULT now(),
     INDEX teams_name (name)

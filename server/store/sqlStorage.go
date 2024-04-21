@@ -43,7 +43,7 @@ func (s *SQLStore) Get() any {
 }
 
 func initializeDatabaseContent(db *sql.DB) error {
-	content, err := os.ReadFile("storage/sql/queries/seed.sql")
+	content, err := os.ReadFile("storage/sql/queries/seed.old.sql")
 	if err != nil {
 		fmt.Println("Error reading file:", err)
 		return nil

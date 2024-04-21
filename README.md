@@ -162,15 +162,15 @@ The schema includes types and tables for managing REST API data, following:
 
 ### Tournament Table
 
-| Field         | Type     | Description                           |
-|---------------|----------|---------------------------------------|
-| `id`          | INT      | Unique identifier for the tournament. |
-| `arena_id`    | INT      | References the associated arena.      |
-| `category_id` | INT      | References the associated category.   |
-| `tenancy_id`  | INT      | References the associated tenancy.    |
-| `name`        | VARCHAR  | Name of the tournament.               |
+| Field         | Type      | Description                           |
+|---------------|-----------|---------------------------------------|
+| `id`          | INT       | Unique identifier for the tournament. |
+| `arena_id`    | INT       | References the associated arena.      |
+| `category_id` | INT       | References the associated category.   |
+| `tenancy_id`  | INT       | References the associated tenancy.    |
+| `name`        | VARCHAR   | Name of the tournament.               |
 | `starting`    | TIMESTAMP | Date of the tournament.               |
-| `max_teams`   | SMALLINT | Maximum number of teams allowed.      |
+| `max_teams`   | SMALLINT  | Maximum number of teams allowed.      |
 | `created`     | TIMESTAMP | Timestamp of tournament creation.     |
 
 ### Category Table
