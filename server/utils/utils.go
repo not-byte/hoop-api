@@ -20,7 +20,7 @@ func GenerateHash(length int) string {
 	return string(hash)
 }
 
-func GenerateToken() int8 {
+func GenerateMailToken() int8 {
 	hash := make([]rune, 6)
 
 	for i := range hash {

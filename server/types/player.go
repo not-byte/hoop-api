@@ -22,7 +22,7 @@ type Account struct {
 	CreatedOn     time.Time
 	LoggedOn      time.Time
 	Verified      bool
-	Token         int8
+	MailToken     int8
 }
 
 type AccountPermission struct {
