@@ -22,7 +22,7 @@ func LoadConfig() (*types.AppConfig, error) {
 		DB_NAME:                           getEnv("DB_NAME", "tournament_dev"),
 		JWT_ACCESS_SECRET:                 getEnv("JWT_ACCESS_SECRET", "not-so-secret-now-is-it?"),
 		JWT_REFRESH_SECRET:                getEnv("JWT_REFRESH_SECRET", "not-so-secret-now-is-it?"),
-		JWT_ACCESS_EXPIRATION_IN_SECONDS:  getEnvAsInt("JWT_ACCESS_EXPIRATION_IN_SECONDS", 600),         //12 minutes
+		JWT_ACCESS_EXPIRATION_IN_SECONDS:  getEnvAsInt("JWT_ACCESS_EXPIRATION_IN_SECONDS", 600),         //10 minutes
 		JWT_REFRESH_EXPIRATION_IN_SECONDS: getEnvAsInt("JWT_REFRESH_EXPIRATION_IN_SECONDS", 3600*24*14), //14 days
 	}
 
