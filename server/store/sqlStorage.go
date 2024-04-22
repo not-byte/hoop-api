@@ -14,8 +14,10 @@ type SQLStore struct {
 }
 
 func NewSQLStore(config *types.AppConfig) (*SQLStore, error) {
-	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
-		config.DB_HOST, config.DB_PORT, config.DB_USER, config.DB_PASSWORD, config.DB_NAME)
+	psqlInfo := fmt.Sprintf(
+		"host=%s port=%s user=%s password=%s database=defaultdb sslmode=disable",
+		config.DB_HOST, config.DB_PORT, config.DB_USER, config.DB_PASSWORD,
+	)
 
 	db, err := sql.Open("postgres", psqlInfo)
 	if err != nil {
@@ -27,7 +29,7 @@ func NewSQLStore(config *types.AppConfig) (*SQLStore, error) {
 		return nil, fmt.Errorf("failed to connect to database: %w", err)
 	}
 
-	err = initializeDatabaseContent(db)
+	err = initialize(db)
 	if err != nil {
 		db.Close()
 		return nil, fmt.Errorf("failed to initialize tables: %w", err)
@@ -42,8 +44,8 @@ func (s *SQLStore) Get() any {
 	return value
 }
 
-func initializeDatabaseContent(db *sql.DB) error {
-	content, err := os.ReadFile("storage/sql/queries/seed.old.sql")
+func initialize(db *sql.DB) error {
+	content, err := os.ReadFile("/home/pszymanski/git/tournament-api/storage/sql/tables.sql")
 	if err != nil {
 		fmt.Println("Error reading file:", err)
 		return nil

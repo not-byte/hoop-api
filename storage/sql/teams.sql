@@ -1,6 +1,6 @@
 CREATE VIEW IF NOT EXISTS categories_quota AS
     SELECT categories.name AS name,
-        categories.gender AS name,
+        categories.gender AS gender,
         count(teams.id) AS amount
     FROM categories, teams
     WHERE categories.id = teams.categories_id
@@ -33,4 +33,5 @@ VALUES
     ('Kodiaks', 'MALE', (SELECT id FROM categories WHERE name = 'U18' AND gender = 'MALE'), (SELECT id FROM cities WHERE name = 'Koziegłowy')),
     ('Keepers', 'MALE', (SELECT id FROM categories WHERE name = 'U18' AND gender = 'MALE'), (SELECT id FROM cities WHERE name = 'Krzanowice')),
     ('Kites', 'MALE', (SELECT id FROM categories WHERE name = 'U18' AND gender = 'MALE'), (SELECT id FROM cities WHERE name = 'Krzepice')),
-    ('Raptors', 'MALE', (SELECT id FROM categories WHERE name = 'U18' AND gender = 'MALE'), (SELECT id FROM cities WHERE name = 'Kuźnia Raciborska'));
+    ('Raptors', 'MALE', (SELECT id FROM categories WHERE name = 'U18' AND gender = 'MALE'), (SELECT id FROM cities WHERE name = 'Kuźnia Raciborska'))
+    ON CONFLICT DO NOTHING;

@@ -16,13 +16,13 @@ type City struct {
 
 type Account struct {
 	ID            int64
+	PermissionsID int64
 	Email         string
 	Password      string
 	CreatedOn     time.Time
 	LoggedOn      time.Time
 	Verified      bool
-	Token         int64
-	PermissionsID int64
+	Token         int8
 }
 
 type AccountPermission struct {

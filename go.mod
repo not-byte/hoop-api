@@ -3,6 +3,7 @@ module tournament_api
 go 1.21.1
 
 require (
+	github.com/cockroachdb/cockroach-go v2.0.1+incompatible
 	github.com/gabriel-vasile/mimetype v1.4.3 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect

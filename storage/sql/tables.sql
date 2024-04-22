@@ -1,9 +1,3 @@
-DROP DATABASE IF EXISTS tournament_dev CASCADE;
-
-CREATE DATABASE IF NOT EXISTS tournament_dev;
-
-USE tournament_dev;
-
 CREATE TYPE IF NOT EXISTS position_enum AS ENUM ('PG', 'SG', 'SF', 'PF', 'C');
 CREATE TYPE IF NOT EXISTS account_enum AS ENUM ('PLAYER', 'REFEREE', 'ADMIN');
 CREATE TYPE IF NOT EXISTS category_enum AS ENUM ('U18', 'OPEN');
@@ -24,20 +18,16 @@ CREATE TABLE IF NOT EXISTS cities (
 
 CREATE TABLE IF NOT EXISTS accounts (
     id BIGINT NOT NULL UNIQUE DEFAULT unique_rowid() PRIMARY KEY,
+    permissions_id BIGINT NOT NULL UNIQUE REFERENCES permissions (id) ON DELETE CASCADE,
     email TEXT NOT NULL UNIQUE,
     password TEXT NOT NULL,
+    token TEXT NOT NULL,
     created_on TIMESTAMP NOT NULL DEFAULT now(),
-    logged_on TIMESTAMP NOT NULL,
-    verication_code TEXT NOT NULL UNIQUE,
-    permissions_id BIGINT NOT NULL UNIQUE REFERENCES permissions (id) ON DELETE CASCADE,
+    logged_on TIMESTAMP,
+    verified BOOLEAN NOT NULL DEFAULT false,
     INDEX accounts_email (email),
-    INDEX accounts_verication_code (verication_code)
-);
-
-CREATE TABLE IF NOT EXISTS accounts_permissions (
-    permissions_id BIGINT NOT NULL REFERENCES permissions (id) ON DELETE CASCADE,
-    accounts_id BIGINT NOT NULL UNIQUE REFERENCES accounts (id) ON DELETE CASCADE,
-    PRIMARY KEY (permissions_id, accounts_id)
+    INDEX accounts_verified (verified),
+    INDEX accounts_token (token)
 );
 
 CREATE TABLE IF NOT EXISTS recoveries (
@@ -45,8 +35,9 @@ CREATE TABLE IF NOT EXISTS recoveries (
     accounts_id BIGINT NOT NULL REFERENCES accounts (id) ON DELETE CASCADE,
     created_on TIMESTAMP NOT NULL DEFAULT now(),
     recovered_on TIMESTAMP DEFAULT NULL,
-    verication_code TEXT NOT NULL UNIQUE,
-    INDEX accounts_verication_code (verication_code)
+    verified BOOLEAN NOT NULL DEFAULT false,
+    verification_code TEXT NOT NULL UNIQUE,
+    INDEX accounts_verication_code (verification_code)
 );
 
 CREATE TABLE IF NOT EXISTS categories (
