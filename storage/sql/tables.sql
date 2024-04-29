@@ -1,7 +1,11 @@
+BEGIN;
+
+
 CREATE TYPE IF NOT EXISTS position_enum AS ENUM ('PG', 'SG', 'SF', 'PF', 'C');
-CREATE TYPE IF NOT EXISTS account_enum AS ENUM ('PLAYER', 'REFEREE', 'ADMIN');
 CREATE TYPE IF NOT EXISTS category_enum AS ENUM ('U18', 'OPEN');
 CREATE TYPE IF NOT EXISTS gender_enum AS ENUM ('MALE', 'FEMALE');
+CREATE TYPE IF NOT EXISTS account_enum AS ENUM ('PLAYER', 'REFEREE', 'ADMIN');
+
 
 CREATE TABLE IF NOT EXISTS permissions (
     id BIGINT NOT NULL UNIQUE DEFAULT unique_rowid() PRIMARY KEY,
@@ -9,25 +13,25 @@ CREATE TABLE IF NOT EXISTS permissions (
     flags BIT(8) NOT NULL DEFAULT B'00000000'
 );
 
-CREATE TABLE IF NOT EXISTS cities (
-    id BIGINT NOT NULL UNIQUE DEFAULT unique_rowid() PRIMARY KEY,
-    name TEXT NOT NULL UNIQUE,
-    state TEXT NOT NULL,
-    INDEX cities_name (name)
-);
-
 CREATE TABLE IF NOT EXISTS accounts (
     id BIGINT NOT NULL UNIQUE DEFAULT unique_rowid() PRIMARY KEY,
-    permissions_id BIGINT NOT NULL UNIQUE REFERENCES permissions (id) ON DELETE CASCADE,
+    permissions_id BIGINT NOT NULL UNIQUE REFERENCES permissions(id) ON DELETE CASCADE,
     email TEXT NOT NULL UNIQUE,
     password TEXT NOT NULL,
-    token TEXT NOT NULL,
+    mail_token TEXT NOT NULL,
     created_on TIMESTAMP NOT NULL DEFAULT now(),
     logged_on TIMESTAMP,
     verified BOOLEAN NOT NULL DEFAULT false,
     INDEX accounts_email (email),
     INDEX accounts_verified (verified),
-    INDEX accounts_token (token)
+    INDEX accounts_token (mail_token) --> czy indexowanie 3 kolumn jest konieczne ?
+);
+
+CREATE TABLE IF NOT EXISTS cities (
+    id BIGINT NOT NULL UNIQUE DEFAULT unique_rowid() PRIMARY KEY,
+    name TEXT NOT NULL UNIQUE,
+    state TEXT NOT NULL,
+    INDEX cities_name (name)
 );
 
 CREATE TABLE IF NOT EXISTS recoveries (
@@ -90,3 +94,5 @@ CREATE TABLE IF NOT EXISTS audits (
     status SMALLINT NOT NULL DEFAULT 0,
     message TEXT NOT NULL
 );
+
+COMMIT;

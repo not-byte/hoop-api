@@ -6,9 +6,8 @@ import (
 )
 
 type Store interface {
-	Get() any
-	GetAccount(id int64) (*types.Account, error)
-	CreateAccount(ctx context.Context, email string, password string) error
+	GetAccountByEmail(email string) (*types.Account, error)
+	CreateAccount(ctx context.Context, email *string, password *string, mailToken int8) error
 	UpdateAccount(account *types.Account) error
 	LoginAccount(id int64) error
 	VerifyAccount(id int64) error

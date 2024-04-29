@@ -9,43 +9,42 @@ import (
 )
 
 type Claims struct {
-	Username string `json:"username"`
-	Lastname string `json:"lastname"`
+	FirstName string `json:"firstname"`
+	Lastname  string `json:"lastname"`
+	Email     string `json:"email"`
 	jwt.RegisteredClaims
 }
-type TOKEN_TYPE string
 
 const ACCESS_TOKEN = "access_token"
 const REFRESH_TOKEN = "refresh_token"
 
-type Token struct {
+type AuthToken struct {
 	name     string
 	key      []byte
 	duration time.Time
 }
 
-func newAccessToken() (t *Token) {
-	accessToken := &Token{
+func (s *Server) newAccessToken() (t *AuthToken) {
+	accessToken := &AuthToken{
 		name:     ACCESS_TOKEN,
-		key:      []byte("secret"),
-		duration: time.Now().Add(time.Minute * 10),
+		key:      []byte(s.config.JWT_ACCESS_SECRET),
+		duration: time.Now().Add(time.Second * time.Duration(s.config.JWT_ACCESS_EXPIRATION_IN_SECONDS)),
 	}
 	return accessToken
 }
 
-func newRefreshToken() (t *Token) {
-	refreshToken := &Token{
+func (s *Server) newRefreshToken() (t *AuthToken) {
+	refreshToken := &AuthToken{
 		name:     REFRESH_TOKEN,
-		key:      []byte("secret"),
-		duration: time.Now().Add(time.Hour * 24 * 15),
+		key:      []byte(s.config.JWT_REFRESH_SECRET),
+		duration: time.Now().Add(time.Second * time.Duration(s.config.JWT_REFRESH_EXPIRATION_IN_SECONDS)),
 	}
 	return refreshToken
 }
 
-func (t *Token) generateTokenString(FirstName *string, LastName *string) (string, error) {
+func (t *AuthToken) generateTokenString(Email *string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &Claims{
-		Username: *FirstName,
-		Lastname: *LastName,
+		Email: *Email,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(t.duration),
 		},
@@ -53,7 +52,7 @@ func (t *Token) generateTokenString(FirstName *string, LastName *string) (string
 	return token.SignedString(t.key)
 }
 
-func (t *Token) verifyToken(tokenStr string) (*Claims, error) {
+func (t *AuthToken) verifyToken(tokenStr string) (*Claims, error) {
 	token, err := jwt.ParseWithClaims(tokenStr, &Claims{}, func(token *jwt.Token) (interface{}, error) {
 		return t.key, nil
 	})
@@ -66,7 +65,7 @@ func (t *Token) verifyToken(tokenStr string) (*Claims, error) {
 	return nil, fmt.Errorf("invalid token")
 }
 
-func (t *Token) saveTokenAsCookie(w http.ResponseWriter, value string) {
+func (t *AuthToken) saveTokenAsCookie(w http.ResponseWriter, value string) {
 	http.SetCookie(w, &http.Cookie{
 		Name:     t.name,
 		Value:    value,

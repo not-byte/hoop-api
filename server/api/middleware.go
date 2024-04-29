@@ -8,7 +8,7 @@ import (
 const API_KEY = "API KEY"
 const EXPECTED_API_KEY = "MY API KEY"
 
-func authenticate(next http.Handler) http.Handler {
+func (s *Server) Authenticate(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		accessTokenString, accessTokenErr := r.Cookie(ACCESS_TOKEN)
 		refreshTokenString, refreshTokenErr := r.Cookie(REFRESH_TOKEN)
@@ -23,8 +23,8 @@ func authenticate(next http.Handler) http.Handler {
 			return
 		}
 
-		accessToken := newAccessToken()
-		refreshToken := newRefreshToken()
+		accessToken := s.newAccessToken()
+		refreshToken := s.newRefreshToken()
 
 		if _, err := accessToken.verifyToken(accessTokenString.Value); err != nil {
 			http.Error(w, "Invalid access token", http.StatusUnauthorized)
@@ -40,7 +40,7 @@ func authenticate(next http.Handler) http.Handler {
 	})
 }
 
-func tokenRefreshMiddleware(next http.Handler) http.Handler {
+func (s *Server) TokenRefreshMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		accessTokenString, accessTokenErr := r.Cookie(ACCESS_TOKEN)
 		refreshTokenString, refreshTokenErr := r.Cookie(REFRESH_TOKEN)
@@ -50,7 +50,7 @@ func tokenRefreshMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		refreshToken := newRefreshToken()
+		refreshToken := s.newRefreshToken()
 
 		refreshTokenClaims, refErr := refreshToken.verifyToken(refreshTokenString.Value)
 		if refErr != nil {
@@ -59,11 +59,11 @@ func tokenRefreshMiddleware(next http.Handler) http.Handler {
 		}
 
 		if accessTokenString == nil || accessTokenErr == http.ErrNoCookie {
-			newAccessToken := newAccessToken()
+			newAccessToken := s.newAccessToken()
 
-			firstName, lastName := refreshTokenClaims.Username, refreshTokenClaims.Lastname
+			email := refreshTokenClaims.Email
 
-			newAccessTokenString, err := newAccessToken.generateTokenString(&firstName, &lastName)
+			newAccessTokenString, err := newAccessToken.generateTokenString(&email)
 			if err != nil {
 				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 				return
@@ -75,7 +75,7 @@ func tokenRefreshMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-func APIKeyMiddleware(next http.Handler) http.Handler {
+func (s *Server) APIKeyMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		apiKey := r.Header.Get(API_KEY)
 
@@ -88,7 +88,7 @@ func APIKeyMiddleware(next http.Handler) http.Handler {
 }
 
 // this will only run on development
-func CORSmiddleware(next http.Handler) http.Handler {
+func (s *Server) CORSmiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS")

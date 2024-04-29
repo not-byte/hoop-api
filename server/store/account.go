@@ -7,14 +7,16 @@ import (
 	"tournament_api/server/types"
 )
 
-func (s *SQLStore) GetAccount(id int64) (*types.Account, error) {
-	stmt, err := s.DB.Prepare("SELECT id, name FROM accounts WHERE id = $1")
+func (s *SQLStore) GetAccountByEmail(email string) (*types.Account, error) {
+	stmt, err := s.DB.Prepare("SELECT id, permissions_id, email, password, created_on, verified, mail_token FROM accounts WHERE email = $1")
 	if err != nil {
 		return nil, err
 	}
 	defer stmt.Close()
 	var account types.Account
-	err = stmt.QueryRow(id).Scan(&account.ID, &account.Email)
+	account.Email = new(string)
+	account.Password = new(string)
+	err = stmt.QueryRow(email).Scan(&account.ID, &account.PermissionsID, account.Email, account.Password, &account.CreatedOn, &account.Verified, &account.MailToken)
 
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -26,15 +28,16 @@ func (s *SQLStore) GetAccount(id int64) (*types.Account, error) {
 	return &account, nil
 }
 
-func (s *SQLStore) CreateAccount(ctx context.Context, email string, password string) error {
+func (s *SQLStore) CreateAccount(ctx context.Context, email *string, password *string, mailToken int8) error {
 
 	fail := func(err error) error {
 		return fmt.Errorf("CreateAccount: %v", err)
 	}
 
 	var account types.Account = types.Account{
-		Email:    email,
-		Password: password,
+		Email:     email,
+		Password:  password,
+		MailToken: mailToken,
 	}
 
 	tx, err := s.DB.BeginTx(ctx, nil)
@@ -50,7 +53,7 @@ func (s *SQLStore) CreateAccount(ctx context.Context, email string, password str
 	}
 
 	if err := tx.QueryRow(
-		"INSERT INTO accounts (permissions_id, email, password, token) VALUES ($1, $2, $3, $4) ON CONFLICT DO NOTHING RETURNING id",
+		"INSERT INTO accounts (permissions_id, email, password, mail_token) VALUES ($1, $2, $3, $4) ON CONFLICT DO NOTHING RETURNING id",
 		account.PermissionsID,
 		account.Email,
 		account.Password,
