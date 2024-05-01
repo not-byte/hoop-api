@@ -31,8 +31,10 @@ func (s *SQLStore) GetTeams() ([]model.Team, error) {
 		if err := rows.Scan(
 			&team.ID,
 			&team.CitiesID,
+			&team.CategoriesID,
 			&team.Name,
 			&team.Description,
+			&team.Phone,
 		); err != nil {
 			return nil, fail(fmt.Errorf("scanning results: %v", err))
 		}
@@ -53,7 +55,7 @@ func (s *SQLStore) GetTeam(id int) (*model.Team, error) {
 
 	var team model.Team
 
-	err := s.DB.QueryRow("SELECT * FROM teams WHERE id = $1", 1).Scan(&team.ID, &team.CitiesID, &team.Name, &team.Description)
+	err := s.DB.QueryRow("SELECT * FROM teams WHERE id = $1", id).Scan(&team.ID, &team.CitiesID, &team.CategoriesID, &team.Name, &team.Description, &team.Phone)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, fail(err)

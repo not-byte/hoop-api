@@ -59,6 +59,7 @@ CREATE TABLE IF NOT EXISTS teams (
     categories_id BIGINT DEFAULT NULL REFERENCES categories (id) ON DELETE CASCADE,
     name TEXT NOT NULL UNIQUE,
     description TEXT DEFAULT NULL,
+    phone TEXT DEFAULT NULL,
     gender gender_enum NOT NULL,
     created_on TIMESTAMP NOT NULL DEFAULT now(),
     INDEX teams_name (name)

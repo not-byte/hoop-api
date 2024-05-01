@@ -3,10 +3,12 @@ package model
 import "time"
 
 type Team struct {
-	ID          int64
-	CitiesID    int64
-	Name        string
-	Description string
+	ID           int64
+	CitiesID     int64
+	CategoriesID string
+	Name         string
+	Description  string
+	Phone        string
 }
 
 type Player struct {
