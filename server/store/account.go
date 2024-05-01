@@ -4,16 +4,16 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"tournament_api/server/types"
+	"tournament_api/server/api/model"
 )
 
-func (s *SQLStore) GetAccountByEmail(email string) (*types.Account, error) {
+func (s *SQLStore) GetAccountByEmail(email string) (*model.Account, error) {
 	stmt, err := s.DB.Prepare("SELECT id, permissions_id, email, password, created_on, verified, mail_token FROM accounts WHERE email = $1")
 	if err != nil {
 		return nil, err
 	}
 	defer stmt.Close()
-	var account types.Account
+	var account model.Account
 	account.Email = new(string)
 	account.Password = new(string)
 	err = stmt.QueryRow(email).Scan(&account.ID, &account.PermissionsID, account.Email, account.Password, &account.CreatedOn, &account.Verified, &account.MailToken)
@@ -34,7 +34,7 @@ func (s *SQLStore) CreateAccount(ctx context.Context, email *string, password *s
 		return fmt.Errorf("CreateAccount: %v", err)
 	}
 
-	var account types.Account = types.Account{
+	var account model.Account = model.Account{
 		Email:     email,
 		Password:  password,
 		MailToken: mailToken,
@@ -69,7 +69,7 @@ func (s *SQLStore) CreateAccount(ctx context.Context, email *string, password *s
 	return nil
 }
 
-func (s *SQLStore) UpdateAccount(account *types.Account) error {
+func (s *SQLStore) UpdateAccount(account *model.Account) error {
 
 	stmt, err := s.DB.Prepare("DELETE FROM accounts WHERE id = $1")
 	if err != nil {
@@ -164,7 +164,7 @@ func (s *SQLStore) DeleteAccount(id int64) error {
 	return nil
 }
 
-func (s *SQLStore) GetAccounts() ([]types.Account, error) {
+func (s *SQLStore) GetAccounts() ([]model.Account, error) {
 	stmt, err := s.DB.Prepare("SELECT * FROM accounts WHERE verified = $1")
 	if err != nil {
 		return nil, fmt.Errorf("GetAccounts: preparing statement: %v", err)
@@ -177,10 +177,10 @@ func (s *SQLStore) GetAccounts() ([]types.Account, error) {
 	}
 	defer rows.Close()
 
-	var accounts []types.Account
+	var accounts []model.Account
 
 	for rows.Next() {
-		var account types.Account
+		var account model.Account
 		if err := rows.Scan(
 			&account.ID,
 			&account.PermissionsID,

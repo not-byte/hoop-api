@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"tournament_api/server/api/model"
 	"tournament_api/server/types"
 	"tournament_api/server/utils"
 
@@ -25,7 +26,7 @@ func (s *Server) handleGetAll(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) handleLogin(w http.ResponseWriter, r *http.Request) {
 
-	var user types.Account
+	var user model.Account
 	errDecode := json.NewDecoder(r.Body).Decode(&user)
 	if errDecode != nil {
 		http.Error(w, "Error while decoding: ", http.StatusInternalServerError)
@@ -74,7 +75,7 @@ func (s *Server) handleLogin(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) handleRegister(w http.ResponseWriter, r *http.Request) {
 
-	var user types.Account
+	var user types.User
 	errDecode := json.NewDecoder(r.Body).Decode(&user)
 	if errDecode != nil {
 		http.Error(w, "Error while decoding: ", http.StatusInternalServerError)
@@ -104,9 +105,8 @@ func (s *Server) handleRegister(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
-	user.MailToken = 9 //mock mail token for now
 
-	err = s.store.CreateAccount(r.Context(), user.Email, &hashedPassword, user.MailToken)
+	err = s.store.CreateAccount(r.Context(), user.Email, &hashedPassword, 9)
 	if err != nil {
 		http.Error(w, "Error while creating account", http.StatusInternalServerError)
 		return

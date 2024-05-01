@@ -1,5 +1,3 @@
-
-
 --> Drop tables
 DROP TABLE IF EXISTS teams_players;
 DROP TABLE IF EXISTS team_players;

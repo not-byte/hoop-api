@@ -1,4 +1,4 @@
-package types
+package model
 
 import (
 	"fmt"
@@ -7,8 +7,8 @@ import (
 )
 
 type Account struct {
-	Email         *string `json:"email" validate:"required,email"`
-	Password      *string `json:"password" validate:"required,gte=8"`
+	Email         *string
+	Password      *string
 	ID            int64
 	PermissionsID int64
 	CreatedOn     time.Time

@@ -1,4 +1,4 @@
-package types
+package model
 
 import "time"
 
@@ -13,7 +13,6 @@ type City struct {
 	Name  string
 	State string
 }
-
 
 type Audit struct {
 	ID      int64
