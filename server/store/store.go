@@ -2,7 +2,7 @@ package store
 
 import (
 	"context"
-	"tournament_api/server/api/model"
+	"tournament_api/server/model"
 )
 
 type Store interface {

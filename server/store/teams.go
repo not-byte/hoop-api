@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"tournament_api/server/api/model"
+	"tournament_api/server/model"
 )
 
 func (s *SQLStore) GetTeams() ([]model.Team, error) {

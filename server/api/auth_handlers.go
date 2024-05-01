@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"tournament_api/server/api/model"
+	"tournament_api/server/model"
 	"tournament_api/server/types"
 	"tournament_api/server/utils"
 
