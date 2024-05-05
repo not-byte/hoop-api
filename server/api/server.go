@@ -29,12 +29,21 @@ func (s *Server) Start() error {
 	} else {
 		rootRouter.Use(s.CORSmiddleware)
 	}
+
 	rootRouter.HandleFunc("/", s.handleGetAll)
 
+	//AUTH SUBSROUTER
 	authRouter := rootRouter.PathPrefix("/auth").Subrouter()
-	authRouter.HandleFunc("", s.handleGetAll)
-	authRouter.HandleFunc("/login", s.handleLogin)
-	authRouter.HandleFunc("/register", s.handleRegister)
+	authRouter.HandleFunc("", s.handleGetAll).Methods("GET")
+	authRouter.HandleFunc("/login", s.handleLogin).Methods("POST")
+	authRouter.HandleFunc("/register", s.handleRegister).Methods("POST")
+
+	//TEAMS SUBROUTER
+	teamsRouter := rootRouter.PathPrefix("/teams").Subrouter()
+	//teamsRouter.Use(s.TokenRefreshMiddleware, s.Authenticate)
+	teamsRouter.HandleFunc("/create", s.handleTeamCreation).Methods("POST")
+	teamsRouter.HandleFunc("", s.handleGetAllTeams).Methods("GET")
+	teamsRouter.HandleFunc("/{id}", s.handleGetTeam).Methods("GET")
 
 	http.Handle("/", rootRouter)
 

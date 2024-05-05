@@ -12,10 +12,22 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+/*
+think about it
+type AuthHandlers struct {
+	store interface{}
+}
+
+func (s *Server) authHandlers() *AuthHandlers {
+	return &AuthHandlers{
+		store: s.store,
+	}
+}
+*/
+
 func (s *Server) handleGetAll(w http.ResponseWriter, r *http.Request) {
 	account, err := s.store.GetAccountByEmail("pawellinek2@gmail.com")
 	if err != nil {
-		fmt.Println(err)
 		http.Error(w, "Invalid login credentials", http.StatusUnauthorized)
 		return
 	}

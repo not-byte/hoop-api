@@ -4,11 +4,14 @@ import "time"
 
 type Team struct {
 	ID           int64
-	CitiesID     int64
-	CategoriesID string
+	CitiesID     *int64
+	CategoriesID *int64
 	Name         string
 	Description  string
 	Phone        string
+	Gender       string
+	Email        string
+	CreatedOn    time.Time
 }
 
 type Player struct {

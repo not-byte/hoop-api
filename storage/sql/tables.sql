@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS accounts (
     verified BOOLEAN NOT NULL DEFAULT false,
     INDEX accounts_email (email),
     INDEX accounts_verified (verified),
-    INDEX accounts_token (mail_token) --> czy indexowanie 3 kolumn jest konieczne ?
+    INDEX accounts_mail_token (mail_token) --> czy indexowanie 3 kolumn jest konieczne ?
 );
 
 CREATE TABLE IF NOT EXISTS cities (
@@ -59,6 +59,7 @@ CREATE TABLE IF NOT EXISTS teams (
     categories_id BIGINT DEFAULT NULL REFERENCES categories (id) ON DELETE CASCADE,
     name TEXT NOT NULL UNIQUE,
     description TEXT DEFAULT NULL,
+    email TEXT DEFAULT NULL,
     phone TEXT DEFAULT NULL,
     gender gender_enum NOT NULL,
     created_on TIMESTAMP NOT NULL DEFAULT now(),
@@ -67,12 +68,13 @@ CREATE TABLE IF NOT EXISTS teams (
 
 CREATE TABLE IF NOT EXISTS players (
     id BIGINT NOT NULL UNIQUE DEFAULT unique_rowid() PRIMARY KEY,
-    accounts_id BIGINT NOT NULL UNIQUE REFERENCES accounts (id) ON DELETE CASCADE,
+    --accounts_id BIGINT NOT NULL UNIQUE REFERENCES accounts (id) ON DELETE CASCADE,
     teams_id BIGINT DEFAULT NULL REFERENCES teams (id) ON DELETE CASCADE,
     first_name TEXT NOT NULL,
     last_name TEXT NOT NULL,
+    age SMALLINT NOT NULL,
     full_name TEXT AS (CONCAT(first_name, ' ', last_name)) STORED,
-    birthday TIMESTAMP NOT NULL,
+    birthday TIMESTAMP,
     gender gender_enum NOT NULL,
     number SMALLINT NOT NULL,
     height SMALLINT NOT NULL,
