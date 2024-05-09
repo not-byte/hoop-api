@@ -1,9 +1,7 @@
 package model
 
 import (
-	"fmt"
 	"time"
-	"tournament_api/server/utils"
 )
 
 type Account struct {
@@ -15,11 +13,6 @@ type Account struct {
 	LoggedOn      time.Time
 	Verified      bool
 	MailToken     int8
-}
-
-func (a Account) String() string {
-	return fmt.Sprintf("ID: %d, PermissionsID: %d, Email: %s, Password: %s, CreatedOn: %v, LoggedOn: %v, Verified: %v, MailToken: %v",
-		a.ID, a.PermissionsID, utils.DerefString(a.Email), utils.DerefString(a.Password), a.CreatedOn, a.LoggedOn, a.Verified, a.MailToken)
 }
 
 type AccountPermission struct {

@@ -1,6 +1,7 @@
 package types
 
 type Team struct {
+	ID          *int64    `json:"id"` // ID is optional because it is not required when creating a new team
 	Name        *string   `json:"name" validate:"required,min=2,max=100"`
 	Email       *string   `json:"email" validate:"required,email"`
 	Description *string   `json:"description" validate:"required"`

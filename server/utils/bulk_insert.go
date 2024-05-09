@@ -67,3 +67,48 @@ func BulkInsert[T any](unsavedRows []*T, tableName string) (string, error) {
 	stmt := fmt.Sprintf("INSERT INTO %s %s VALUES %s", tableName, columns, strings.Join(valStrings, ", "))
 	return stmt, nil
 }
+
+func BulkUpdate[T any](updatedRows []*T, tableName string, condition string) (string, error) {
+	slice := reflect.ValueOf(updatedRows)
+	if slice.Kind() != reflect.Slice {
+		return "", fmt.Errorf("updatedRows must be a slice")
+	}
+
+	if slice.Len() == 0 {
+		return "", fmt.Errorf("updatedRows slice is empty")
+	}
+
+	firstRow := slice.Index(0).Elem()
+	if firstRow.Kind() != reflect.Struct {
+		return "", fmt.Errorf("element in the slice is not a struct")
+	}
+
+	columnCount := firstRow.NumField()
+	columnNames := make([]string, 0, columnCount)
+	t := reflect.TypeOf(*updatedRows[0])
+	for i := 0; i < t.NumField(); i++ {
+		columnNames = append(columnNames, t.Field(i).Tag.Get("json"))
+	}
+
+	valStrings := make([]string, 0, slice.Len())
+	for i := 0; i < slice.Len(); i++ {
+		el := slice.Index(i).Elem()
+		if el.Kind() != reflect.Struct {
+			return "", fmt.Errorf("element %d in the slice is not a struct", i)
+		}
+
+		placeholders := make([]string, columnCount)
+		for j := 0; j < columnCount; j++ {
+			field := el.Field(j)
+			if !field.CanInterface() {
+				return "", fmt.Errorf("cannot interface field %d of element %d", j, i)
+			}
+
+			placeholders[j] = fmt.Sprintf("%s = %s", columnNames[j], FormatField(field))
+		}
+		valStrings = append(valStrings, strings.Join(placeholders, ", "))
+	}
+
+	stmt := fmt.Sprintf("UPDATE %s SET %s WHERE %s", tableName, strings.Join(valStrings, ", "), condition)
+	return stmt, nil
+}

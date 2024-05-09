@@ -20,6 +20,6 @@ type Store interface {
 	GetTeams() ([]model.Team, error)
 	GetTeam(id int64) (*model.Team, error)
 	CreateTeam(ctx context.Context, team *types.Team) error
-	UpdateTeam(id int) error
+	UpdateTeam(team *types.Team) error
 	DeleteTeam(id int) error
 }

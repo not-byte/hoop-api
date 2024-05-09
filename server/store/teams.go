@@ -93,7 +93,7 @@ func (s *SQLStore) CreateTeam(ctx context.Context, team *types.Team) error {
 		return fmt.Errorf("CreateTeam: %v", err)
 	}
 
-	if err := insertPlayers(tx, team.Players, *id); err != nil {
+	if err := insertPlayers(tx, team.Players, int64(*id)); err != nil {
 		return fmt.Errorf("CreateTeam: %v", err)
 	}
 
@@ -104,11 +104,39 @@ func (s *SQLStore) CreateTeam(ctx context.Context, team *types.Team) error {
 	return nil
 }
 
-func (s *SQLStore) UpdateTeam(id int) error {
+func (s *SQLStore) UpdateTeam(team *types.Team) error {
+	tx, err := s.DB.BeginTx(context.Background(), nil)
+	if err != nil {
+		return fmt.Errorf("UpdateTeam: starting transaction: %v", err)
+	}
+	defer tx.Rollback()
+
+	_, err = tx.Exec("UPDATE teams SET name = $1, email = $2, description = $3, phone = $4, gender = $5 WHERE id = $6",
+		team.Name, team.Email, team.Description, team.Phone, team.Gender, team.ID)
+	if err != nil {
+		return fmt.Errorf("UpdateTeam: %v", err)
+	}
+
+	if err := deletePlayers(tx, int64(*team.ID)); err != nil {
+		return fmt.Errorf("UpdateTeam: %v", err)
+	}
+
+	if err := insertPlayers(tx, team.Players, int64(*team.ID)); err != nil {
+		return fmt.Errorf("UpdateTeam: %v", err)
+	}
+
+	if err := tx.Commit(); err != nil {
+		return fmt.Errorf("UpdateTeam: committing transaction: %v", err)
+	}
+
 	return nil
 }
 
 func (s *SQLStore) DeleteTeam(id int) error {
+	_, err := s.DB.Exec("DELETE FROM teams WHERE id = $1", id)
+	if err != nil {
+		return fmt.Errorf("DeleteTeam: %v", err)
+	}
 	return nil
 }
 
@@ -125,7 +153,7 @@ func insertTeam(tx *sql.Tx, team *types.Team) (*int, error) {
 	return &id, nil
 }
 
-func insertPlayers(tx *sql.Tx, players []*types.Player, id int) error {
+func insertPlayers(tx *sql.Tx, players []*types.Player, id int64) error {
 	query, err := utils.BulkInsert(players, "players")
 	if err != nil {
 		return fmt.Errorf("failed to create bulk insert query: %v", err)
@@ -137,5 +165,13 @@ func insertPlayers(tx *sql.Tx, players []*types.Player, id int) error {
 		return fmt.Errorf("failed to execute the bulk insert statement: %v", err)
 	}
 
+	return nil
+}
+
+func deletePlayers(tx *sql.Tx, teamID int64) error {
+	_, err := tx.Exec("DELETE FROM players WHERE team_id = $1", teamID)
+	if err != nil {
+		return fmt.Errorf("deletePlayers: %v", err)
+	}
 	return nil
 }

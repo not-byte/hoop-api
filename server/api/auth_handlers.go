@@ -31,9 +31,8 @@ func (s *Server) handleGetAll(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid login credentials", http.StatusUnauthorized)
 		return
 	}
-	fmt.Println(account.String())
 
-	json.NewEncoder(w).Encode("test")
+	json.NewEncoder(w).Encode(*account)
 }
 
 func (s *Server) handleLogin(w http.ResponseWriter, r *http.Request) {
