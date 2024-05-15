@@ -41,9 +41,9 @@ func (s *Server) Start() error {
 	//TEAMS SUBROUTER
 	teamsRouter := rootRouter.PathPrefix("/teams").Subrouter()
 	//teamsRouter.Use(s.TokenRefreshMiddleware, s.Authenticate)
-	teamsRouter.HandleFunc("/create", s.handleTeamCreation).Methods("POST")
 	teamsRouter.HandleFunc("", s.handleGetAllTeams).Methods("GET")
 	teamsRouter.HandleFunc("/{id}", s.handleGetTeam).Methods("GET")
+	teamsRouter.HandleFunc("", s.handleTeamCreation).Methods("POST")
 
 	http.Handle("/", rootRouter)
 
