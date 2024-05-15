@@ -5,8 +5,8 @@ import (
 	"tournament_api/server/utils"
 )
 
-const API_KEY = "API KEY"
-const EXPECTED_API_KEY = "MY API KEY"
+const API_KEY = "X-API-KEY"
+const EXPECTED_API_KEY = "tournament"
 
 func (s *Server) Authenticate(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
