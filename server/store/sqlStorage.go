@@ -32,12 +32,6 @@ func NewSQLStore(config *types.AppConfig) (*SQLStore, error) {
 		return nil, fmt.Errorf("failed to connect to database: %w", err)
 	}
 
-	err = clear(db)
-	if err != nil {
-		db.Close()
-		return nil, fmt.Errorf("failed to clear tables: %w", err)
-	}
-
 	err = initialize(db)
 	if err != nil {
 		db.Close()

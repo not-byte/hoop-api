@@ -21,13 +21,14 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to create SQL Store: %v", err)
 	}
+	defer store.DB.Close()
 
 	server := api.NewServer(*listenAddr, store, config)
+
+	fmt.Println("server running on", *listenAddr)
+
 	if err := server.Start(); err != nil {
 		log.Fatalf("Failed to start a HTTP Server: %v", err)
 	}
 
-	defer store.DB.Close()
-
-	fmt.Println("server running on:", *listenAddr)
 }
