@@ -31,6 +31,10 @@ func (s *Server) handleGetAll(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid login credentials", http.StatusUnauthorized)
 		return
 	}
+	if account == nil {
+		http.Error(w, "Account does not exist", http.StatusBadRequest)
+		return
+	}
 
 	json.NewEncoder(w).Encode(*account)
 }
@@ -81,7 +85,10 @@ func (s *Server) handleLogin(w http.ResponseWriter, r *http.Request) {
 	accessToken.saveTokenAsCookie(w, accessTokenString)
 	refreshToken.saveTokenAsCookie(w, refreshTokenString)
 
-	json.NewEncoder(w).Encode(map[string]string{"message": "login successful"})
+	if err := json.NewEncoder(w).Encode(map[string]string{"message": "login successful"}); err != nil {
+		http.Error(w, "Error encoding response", http.StatusInternalServerError)
+		return
+	}
 }
 
 func (s *Server) handleRegister(w http.ResponseWriter, r *http.Request) {
@@ -137,5 +144,9 @@ func (s *Server) handleRegister(w http.ResponseWriter, r *http.Request) {
 	accessToken.saveTokenAsCookie(w, accessTokenString)
 	refreshToken.saveTokenAsCookie(w, refreshTokenString)
 
-	json.NewEncoder(w).Encode(map[string]string{"message": "register successful"})
+	response := map[string]string{"message": "register successful"}
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		http.Error(w, "Error encoding response", http.StatusInternalServerError)
+		return
+	}
 }
