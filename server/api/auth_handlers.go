@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"tournament_api/server/model"
 	"tournament_api/server/types"
@@ -28,7 +27,7 @@ func (s *Server) authHandlers() *AuthHandlers {
 func (s *Server) handleGetAll(w http.ResponseWriter, r *http.Request) {
 	account, err := s.store.GetAccountByEmail("pawellinek2@gmail.com")
 	if err != nil {
-		http.Error(w, "Invalid login credentials", http.StatusUnauthorized)
+		http.Error(w, "Invalid login credentials "+err.Error(), http.StatusUnauthorized)
 		return
 	}
 	if account == nil {
@@ -55,7 +54,7 @@ func (s *Server) handleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	account, err := s.store.GetAccountByEmail(*user.Email)
+	account, err := s.store.GetAccountByEmail(user.Email)
 	if err != nil {
 		http.Error(w, "Error searching for account", http.StatusInternalServerError)
 		return
@@ -65,7 +64,7 @@ func (s *Server) handleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = bcrypt.CompareHashAndPassword([]byte(*account.Password), []byte(*user.Password))
+	err = bcrypt.CompareHashAndPassword([]byte(account.Password), []byte(user.Password))
 	if err != nil {
 		http.Error(w, "Invalid login credentials", http.StatusUnauthorized)
 		return
@@ -74,8 +73,8 @@ func (s *Server) handleLogin(w http.ResponseWriter, r *http.Request) {
 	accessToken := s.newAccessToken()
 	refreshToken := s.newRefreshToken()
 
-	accessTokenString, errAccess := accessToken.generateTokenString(user.Email)
-	refreshTokenString, errRefresh := refreshToken.generateTokenString(user.Email)
+	accessTokenString, errAccess := accessToken.generateTokenString(&user.Email)
+	refreshTokenString, errRefresh := refreshToken.generateTokenString(&user.Email)
 
 	if errAccess != nil || errRefresh != nil {
 		http.Error(w, "Error generating token string", http.StatusInternalServerError)
@@ -109,12 +108,11 @@ func (s *Server) handleRegister(w http.ResponseWriter, r *http.Request) {
 
 	account, err := s.store.GetAccountByEmail(*user.Email)
 	if account != nil {
-		http.Error(w, "Account alredy exists", http.StatusBadRequest)
+		http.Error(w, "Account alredy exists "+err.Error(), http.StatusBadRequest)
 		return
 	}
 	if err != nil {
-		fmt.Println(err)
-		http.Error(w, "Error", http.StatusInternalServerError)
+		http.Error(w, "Error "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -124,7 +122,7 @@ func (s *Server) handleRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = s.store.CreateAccount(r.Context(), user.Email, &hashedPassword, 9)
+	err = s.store.CreateAccount(r.Context(), *user.Email, hashedPassword, 9)
 	if err != nil {
 		http.Error(w, "Error while creating account", http.StatusInternalServerError)
 		return

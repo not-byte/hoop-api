@@ -45,6 +45,12 @@ func (s *Server) Start() error {
 	teamsRouter.HandleFunc("/{id}", s.handleGetTeam).Methods("GET")
 	teamsRouter.HandleFunc("", s.handleTeamCreation).Methods("POST")
 
+	//PLAYERS SUBROUTER
+	playersRouter := rootRouter.PathPrefix("/players").Subrouter()
+	//playersRouter.Use(s.TokenRefreshMiddleware, s.Authenticate)
+	playersRouter.HandleFunc("", s.handleGetAllPlayers).Methods("GET")
+	playersRouter.HandleFunc("/team/{teams_id}", s.handleGetTeamPlayers).Methods("GET")
+
 	http.Handle("/", rootRouter)
 
 	return http.ListenAndServe(s.listenAddr, nil)

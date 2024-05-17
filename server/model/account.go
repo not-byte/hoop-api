@@ -5,8 +5,8 @@ import (
 )
 
 type Account struct {
-	Email         *string
-	Password      *string
+	Email         string
+	Password      string
 	ID            int64
 	PermissionsID int64
 	CreatedOn     time.Time

@@ -9,12 +9,12 @@ import (
 	"tournament_api/server/utils"
 )
 
-func (s *SQLStore) GetTeams() ([]model.Team, error) {
+func (s *SQLStore) GetTeams() ([]model.TeamDTO, error) {
 	fail := func(err error) error {
 		return fmt.Errorf("GetTeams: %v", err)
 	}
 
-	stmt, err := s.DB.Prepare("SELECT * FROM teams")
+	stmt, err := s.DB.Prepare("SELECT id, name, email, category, phone FROM teams")
 	if err != nil {
 		return nil, fail(fmt.Errorf("preparing statement: %v", err))
 	}
@@ -26,20 +26,16 @@ func (s *SQLStore) GetTeams() ([]model.Team, error) {
 	}
 	defer rows.Close()
 
-	var teams []model.Team
+	var teams []model.TeamDTO
 
 	for rows.Next() {
-		var team model.Team
+		var team model.TeamDTO
 		if err := rows.Scan(
 			&team.ID,
-			&team.CitiesID,
-			&team.CategoriesID,
 			&team.Name,
-			&team.Description,
 			&team.Email,
+			&team.Category,
 			&team.Phone,
-			&team.Gender,
-			&team.CreatedOn,
 		); err != nil {
 			return nil, fail(fmt.Errorf("scanning results: %v", err))
 		}
@@ -60,15 +56,12 @@ func (s *SQLStore) GetTeam(id int64) (*model.Team, error) {
 
 	var team model.Team
 
-	err := s.DB.QueryRow("SELECT * FROM teams WHERE id = $1", id).Scan(&team.ID,
-		&team.CitiesID,
-		&team.CategoriesID,
+	err := s.DB.QueryRow("SELECT name, email, category, phone FROM teams WHERE id = $1", id).Scan(&team.ID,
 		&team.Name,
-		&team.Description,
 		&team.Email,
+		&team.Category,
 		&team.Phone,
-		&team.Gender,
-		&team.CreatedOn)
+	)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, fail(err)
@@ -88,8 +81,10 @@ func (s *SQLStore) CreateTeam(ctx context.Context, team *types.Team) error {
 	defer tx.Rollback()
 
 	id, err := insertTeam(tx, team)
-
 	if err != nil {
+		return fmt.Errorf("CreateTeam: %v", err)
+	}
+	if id == nil {
 		return fmt.Errorf("CreateTeam: %v", err)
 	}
 
@@ -132,7 +127,7 @@ func (s *SQLStore) UpdateTeam(team *types.Team) error {
 	return nil
 }
 
-func (s *SQLStore) DeleteTeam(id int) error {
+func (s *SQLStore) DeleteTeam(id int64) error {
 	_, err := s.DB.Exec("DELETE FROM teams WHERE id = $1", id)
 	if err != nil {
 		return fmt.Errorf("DeleteTeam: %v", err)
@@ -144,8 +139,8 @@ func (s *SQLStore) DeleteTeam(id int) error {
 func insertTeam(tx *sql.Tx, team *types.Team) (*int, error) {
 	var id int
 	if err := tx.QueryRow(
-		"INSERT INTO teams (name, email, description, phone, gender) VALUES ($1, $2, $3, $4, $5) ON CONFLICT DO NOTHING RETURNING ID",
-		team.Name, team.Email, team.Description, team.Phone, team.Gender,
+		"INSERT INTO teams (name, email, description, phone, gender, category) VALUES ($1, $2, $3, $4, $5, $6) ON CONFLICT DO NOTHING RETURNING ID",
+		team.Name, team.Email, team.Description, team.Phone, team.Gender, team.Category,
 	).Scan(&id); err != nil {
 		return nil, fmt.Errorf("inserting team : %v", err)
 	}
@@ -153,13 +148,16 @@ func insertTeam(tx *sql.Tx, team *types.Team) (*int, error) {
 	return &id, nil
 }
 
-func insertPlayers(tx *sql.Tx, players []*types.Player, id int64) error {
+func insertPlayers(tx *sql.Tx, players []*types.Player, team_id int64) error {
+	for _, player := range players {
+		player.TeamID = team_id
+	}
 	query, err := utils.BulkInsert(players, "players")
 	if err != nil {
 		return fmt.Errorf("failed to create bulk insert query: %v", err)
 	}
 	query += " ON CONFLICT DO NOTHING"
-
+	fmt.Println(query)
 	_, err = tx.Exec(query)
 	if err != nil {
 		return fmt.Errorf("failed to execute the bulk insert statement: %v", err)

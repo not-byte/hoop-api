@@ -14,13 +14,11 @@ func (s *SQLStore) GetAccountByEmail(email string) (*model.Account, error) {
 	}
 	defer stmt.Close()
 	var account model.Account
-	account.Email = new(string)
-	account.Password = new(string)
 	err = stmt.QueryRow(email).Scan(&account.ID, &account.PermissionsID, account.Email, account.Password, &account.CreatedOn, &account.Verified, &account.MailToken)
 
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil, nil
+			return nil, err
 		}
 		return nil, err
 	}
@@ -28,7 +26,7 @@ func (s *SQLStore) GetAccountByEmail(email string) (*model.Account, error) {
 	return &account, nil
 }
 
-func (s *SQLStore) CreateAccount(ctx context.Context, email *string, password *string, mailToken int8) error {
+func (s *SQLStore) CreateAccount(ctx context.Context, email string, password string, mailToken int8) error {
 
 	fail := func(err error) error {
 		return fmt.Errorf("CreateAccount: %v", err)

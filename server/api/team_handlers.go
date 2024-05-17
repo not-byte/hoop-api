@@ -15,12 +15,11 @@ import (
 func (s *Server) handleGetAllTeams(w http.ResponseWriter, r *http.Request) {
 	teams, err := s.store.GetTeams()
 	if err != nil {
-		fmt.Println(err)
-		http.Error(w, "Invalid login credentials", http.StatusUnauthorized)
+		http.Error(w, "Invalid login credentials"+err.Error(), http.StatusUnauthorized)
 		return
 	}
 
-	json.NewEncoder(w).Encode(map[string][]model.Team{"teams": teams})
+	json.NewEncoder(w).Encode(map[string][]model.TeamDTO{"teams": teams})
 }
 
 func (s *Server) handleGetTeam(w http.ResponseWriter, r *http.Request) {
@@ -37,18 +36,19 @@ func (s *Server) handleGetTeam(w http.ResponseWriter, r *http.Request) {
 	team, err := s.store.GetTeam(id)
 	if err != nil {
 		fmt.Println(err)
-		http.Error(w, "Invalid login credentials"+err.Error(), http.StatusUnauthorized)
+		http.Error(w, "Invalid login credentials "+err.Error(), http.StatusUnauthorized)
 		return
+	}
+	if team == nil {
+		http.Error(w, "Team not found "+err.Error(), http.StatusUnauthorized)
+		return
+
 	}
 
 	json.NewEncoder(w).Encode(map[string]model.Team{"team": *team})
 }
 
 func (s *Server) handleTeamCreation(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "POST" {
-		http.Error(w, "Wrong method", http.StatusMethodNotAllowed)
-		return
-	}
 
 	var team types.Team
 	err := json.NewDecoder(r.Body).Decode(&team)
