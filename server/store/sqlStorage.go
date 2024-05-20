@@ -50,7 +50,7 @@ func NewSQLStore(config *types.AppConfig) (*SQLStore, error) {
 
 func initialize(db *sql.DB) error {
 
-	content, err := os.ReadFile("storage/sql/tables.sql")
+	content, err := os.ReadFile("../storage/sql/tables.sql")
 	if err != nil {
 		fmt.Println("Error reading file:", err)
 		return err
@@ -66,7 +66,7 @@ func initialize(db *sql.DB) error {
 }
 
 func clear(db *sql.DB) error {
-	content, err := os.ReadFile("storage/sql/clear_tables.sql")
+	content, err := os.ReadFile("../storage/sql/clear_tables.sql")
 	if err != nil {
 		return err
 	}
