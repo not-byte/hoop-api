@@ -12,7 +12,7 @@ import (
 func (s *Server) handleGetTeamPlayers(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
-	idStr := vars["teams_id"]
+	idStr := vars["id"]
 
 	id, err := strconv.ParseInt(idStr, 10, 64)
 	if err != nil {

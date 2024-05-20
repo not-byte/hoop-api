@@ -13,8 +13,8 @@ func LoadConfig() (*types.AppConfig, error) {
 
 	config := &types.AppConfig{
 		PRODUCTION:                        getEnvAsBool("PRODUCTION", false),
-		PUBLIC_HOST:                       getEnv("PUBLIC_HOST", "http://localhost"),
-		PORT:                              getEnv("PORT", ":8080"),
+		PUBLIC_HOST:                       getEnv("PUBLIC_HOST", "http://127.0.0.1"),
+		PORT:                              getEnv("PORT", ":3000"),
 		DB_USER:                           getEnv("DB_USER", "root"),
 		DB_PASSWORD:                       getEnv("DB_PASSWORD", ""),
 		DB_HOST:                           getEnv("DB_HOST", "eu2.notbyte.com"),

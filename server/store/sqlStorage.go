@@ -9,9 +9,6 @@ import (
 	_ "github.com/lib/pq"
 )
 
-// we need to store previously prepared stmts here that are run often
-// prepared queries make compilation stage cached, so it speeds things up
-// use only for frequently used queries
 type SQLStore struct {
 	DB *sql.DB
 }
@@ -24,32 +21,32 @@ func NewSQLStore(config *types.AppConfig) (*SQLStore, error) {
 
 	db, err := sql.Open("postgres", psqlInfo)
 	if err != nil {
-		return nil, fmt.Errorf("failed to open database: %w", err)
+		return nil, fmt.Errorf("[STORE] Failed to open database: %w", err)
 	}
 
 	if err := db.Ping(); err != nil {
 		db.Close()
-		return nil, fmt.Errorf("failed to connect to database: %w", err)
+		return nil, fmt.Errorf("[STORE] Failed to connect to the database: %w", err)
 	}
 
-	err = clear(db)
-	if err != nil {
-		db.Close()
-		return nil, fmt.Errorf("failed to clear tables: %w", err)
+	if !config.PRODUCTION {
+		err = clear(db)
+		if err != nil {
+			db.Close()
+			return nil, fmt.Errorf("[STORE] Failed to clear tables: %w", err)
+		}
 	}
 
 	err = initialize(db)
 	if err != nil {
 		db.Close()
-		return nil, fmt.Errorf("failed to initialize tables: %w", err)
+		return nil, fmt.Errorf("[STORE] Failed to initialize tables: %w", err)
 	}
 
-	fmt.Println("Successfully connected to the database!")
 	return &SQLStore{DB: db}, nil
 }
 
 func initialize(db *sql.DB) error {
-
 	content, err := os.ReadFile("../storage/sql/tables.sql")
 	if err != nil {
 		fmt.Println("Error reading file:", err)
@@ -58,7 +55,7 @@ func initialize(db *sql.DB) error {
 
 	_, err = db.Exec(string(content))
 	if err != nil {
-		fmt.Println("Error executing creation of tables:", err)
+		fmt.Println("[STORE] Error executing creation of tables:", err)
 		return err
 	}
 
@@ -68,6 +65,7 @@ func initialize(db *sql.DB) error {
 func clear(db *sql.DB) error {
 	content, err := os.ReadFile("../storage/sql/clear_tables.sql")
 	if err != nil {
+		fmt.Println("[STORE] Error reading file:", err)
 		return err
 	}
 

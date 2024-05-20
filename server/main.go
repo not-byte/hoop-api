@@ -25,10 +25,9 @@ func main() {
 
 	server := api.NewServer(*listenAddr, store, config)
 
-	fmt.Println("server running on", *listenAddr)
+	fmt.Println("API Server running on", fmt.Sprintf("%s%s", config.PUBLIC_HOST, *listenAddr))
 
 	if err := server.Start(); err != nil {
 		log.Fatalf("Failed to start a HTTP Server: %v", err)
 	}
-
 }
