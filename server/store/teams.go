@@ -56,7 +56,7 @@ func (s *SQLStore) GetTeam(id int64) (*model.Team, error) {
 
 	var team model.Team
 
-	err := s.DB.QueryRow("SELECT name, email, category, phone FROM teams WHERE id = $1", id).Scan(&team.ID,
+	err := s.DB.QueryRow("SELECT id, name, email, category, phone FROM teams WHERE id = $1", id).Scan(&team.ID,
 		&team.Name,
 		&team.Email,
 		&team.Category,
