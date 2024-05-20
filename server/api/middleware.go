@@ -5,10 +5,31 @@ import (
 	"tournament_api/server/utils"
 )
 
-const API_KEY = "X-API-KEY"
+const API_KEY = "X-Api-Key"
 const EXPECTED_API_KEY = "tournament"
 
-func (s *Server) Authenticate(next http.Handler) http.Handler {
+func (s *Server) HeadersMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+
+		w.Header().Set("Content-Security-Policy", "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests")
+		w.Header().Set("Cross-Origin-Opener-Policy", "same-origin")
+		w.Header().Set("Cross-Origin-Resource-Policy", "same-origin")
+		w.Header().Set("Origin-Agent-Cluster", "?1")
+		w.Header().Set("Referrer-Policy", "no-referrer")
+		w.Header().Set("Strict-Transport-Security", "max-age=15552000; includeSubDomains")
+		w.Header().Set("X-Content-Type-Options", "nosniff")
+		w.Header().Set("X-DNS-Prefetch-Control", "off")
+		w.Header().Set("X-Download-Options", "noopen")
+		w.Header().Set("X-Frame-Options", "SAMEORIGIN")
+		w.Header().Set("X-Permitted-Cross-Domain-Policies", "none")
+		w.Header().Set("X-XSS-Protection", "0")
+
+		next.ServeHTTP(w, r)
+	})
+}
+
+func (s *Server) AuthenticateMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		accessTokenString, accessTokenErr := r.Cookie(ACCESS_TOKEN)
 		refreshTokenString, refreshTokenErr := r.Cookie(REFRESH_TOKEN)
@@ -88,7 +109,7 @@ func (s *Server) APIKeyMiddleware(next http.Handler) http.Handler {
 }
 
 // this will only run on development
-func (s *Server) CORSmiddleware(next http.Handler) http.Handler {
+func (s *Server) CORSMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS")

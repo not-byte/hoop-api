@@ -24,10 +24,13 @@ func NewServer(listenAddr string, store store.Store, config *types.AppConfig) *S
 
 func (s *Server) Start() error {
 	rootRouter := mux.NewRouter()
+
+	rootRouter.Use(s.HeadersMiddleware)
+
 	if s.config.PRODUCTION {
 		rootRouter.Use(s.APIKeyMiddleware)
 	} else {
-		rootRouter.Use(s.CORSmiddleware)
+		rootRouter.Use(s.CORSMiddleware)
 	}
 
 	rootRouter.HandleFunc("/", s.handleGetAll)
@@ -47,7 +50,7 @@ func (s *Server) Start() error {
 
 	//PLAYERS SUBROUTER
 	playersRouter := rootRouter.PathPrefix("/players").Subrouter()
-	//playersRouter.Use(s.TokenRefreshMiddleware, s.Authenticate)
+	//playersRouter.Use(s.TokenRefreshMiddleware, s.AuthenticateMiddleware)
 	playersRouter.HandleFunc("", s.handleGetAllPlayers).Methods("GET")
 	playersRouter.HandleFunc("/team/{teams_id}", s.handleGetTeamPlayers).Methods("GET")
 
