@@ -40,18 +40,18 @@ func (s *Server) Start() error {
 	authRouter.HandleFunc("/login", s.handleLogin).Methods("POST")
 	authRouter.HandleFunc("/register", s.handleRegister).Methods("POST")
 
-	teamsRouter := rootRouter.PathPrefix("teams").Subrouter()
+	teamsRouter := rootRouter.PathPrefix("/teams").Subrouter()
 	//teamsRouter.Use(s.TokenRefreshMiddleware, s.Authenticate)
 	teamsRouter.HandleFunc("", s.handleGetAllTeams).Methods("GET")
-	teamsRouter.HandleFunc("{id}", s.handleGetTeam).Methods("GET")
-	teamsRouter.HandleFunc("{id}/players", s.handleGetTeamPlayers).Methods("GET")
+	teamsRouter.HandleFunc("/{id}", s.handleGetTeam).Methods("GET")
+	teamsRouter.HandleFunc("/{id}/players", s.handleGetTeamPlayers).Methods("GET")
 	teamsRouter.HandleFunc("", s.handleTeamCreation).Methods("POST")
 
-	playersRouter := rootRouter.PathPrefix("players").Subrouter()
+	playersRouter := rootRouter.PathPrefix("/players").Subrouter()
 	//playersRouter.Use(s.TokenRefreshMiddleware, s.AuthenticateMiddleware)
 	playersRouter.HandleFunc("", s.handleGetAllPlayers).Methods("GET")
 
-	http.Handle("/", rootRouter)
+	http.Handle("/v1/", rootRouter)
 
 	return http.ListenAndServe(s.listenAddr, nil)
 }
