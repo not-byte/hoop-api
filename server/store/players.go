@@ -58,6 +58,32 @@ func (store *SQLStore) GetPlayers(teamID int64) ([]model.PlayerDTO, error) {
 	return players, nil
 }
 
+func insertPlayers(tx *sql.Tx, players []*types.Player, team_id int64) error {
+	for _, player := range players {
+		player.TeamID = team_id
+	}
+	query, err := utils.BulkInsert(players, "players")
+	if err != nil {
+		return fmt.Errorf("failed to create bulk insert query: %v", err)
+	}
+	query += " ON CONFLICT DO NOTHING"
+	fmt.Println(query)
+	_, err = tx.Exec(query)
+	if err != nil {
+		return fmt.Errorf("failed to execute the bulk insert statement: %v", err)
+	}
+
+	return nil
+}
+
+func deletePlayers(tx *sql.Tx, teamID int64) error {
+	_, err := tx.Exec("DELETE FROM players WHERE team_id = $1", teamID)
+	if err != nil {
+		return fmt.Errorf("deletePlayers: %v", err)
+	}
+	return nil
+}
+
 func (store *SQLStore) GetPlayer(id int64) (*model.PlayerDTO, error) {
 	fail := func(err error) error {
 		return err

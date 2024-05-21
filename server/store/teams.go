@@ -14,7 +14,7 @@ func (s *SQLStore) GetTeams() ([]model.TeamDTO, error) {
 		return fmt.Errorf("GetTeams: %v", err)
 	}
 
-	stmt, err := s.DB.Prepare("SELECT id, name, email, category, phone FROM teams")
+	stmt, err := s.DB.Prepare("SELECT teams.id, teams.name, category.name, teams.email, teams.phone, cities FROM teams, categories, cities WHERE teams.categories_id = categories.id AND teams.cities_id = cities.id")
 	if err != nil {
 		return nil, fail(fmt.Errorf("preparing statement: %v", err))
 	}
@@ -33,9 +33,10 @@ func (s *SQLStore) GetTeams() ([]model.TeamDTO, error) {
 		if err := rows.Scan(
 			&team.ID,
 			&team.Name,
-			&team.Email,
 			&team.Category,
+			&team.Email,
 			&team.Phone,
+			&team.City
 		); err != nil {
 			return nil, fail(fmt.Errorf("scanning results: %v", err))
 		}
@@ -56,11 +57,13 @@ func (s *SQLStore) GetTeam(id int64) (*model.Team, error) {
 
 	var team model.Team
 
-	err := s.DB.QueryRow("SELECT id, name, email, category, phone FROM teams WHERE id = $1", id).Scan(&team.ID,
+	err := s.DB.QueryRow("SELECT teams.id, teams.name, category.name, teams.email, teams.phone, cities.name FROM teams, categories, cities WHERE teams.categories_id = categories.id AND teams.cities_id = cities.id AND id = $1", id).Scan(&team.ID,
+		&team.ID,
 		&team.Name,
-		&team.Email,
 		&team.Category,
+		&team.Email,
 		&team.Phone,
+		&team.City,
 	)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -70,7 +73,6 @@ func (s *SQLStore) GetTeam(id int64) (*model.Team, error) {
 	}
 
 	return &team, nil
-
 }
 
 func (s *SQLStore) CreateTeam(ctx context.Context, team *types.Team) error {
@@ -146,30 +148,4 @@ func insertTeam(tx *sql.Tx, team *types.Team) (*int, error) {
 	}
 
 	return &id, nil
-}
-
-func insertPlayers(tx *sql.Tx, players []*types.Player, team_id int64) error {
-	for _, player := range players {
-		player.TeamID = team_id
-	}
-	query, err := utils.BulkInsert(players, "players")
-	if err != nil {
-		return fmt.Errorf("failed to create bulk insert query: %v", err)
-	}
-	query += " ON CONFLICT DO NOTHING"
-	fmt.Println(query)
-	_, err = tx.Exec(query)
-	if err != nil {
-		return fmt.Errorf("failed to execute the bulk insert statement: %v", err)
-	}
-
-	return nil
-}
-
-func deletePlayers(tx *sql.Tx, teamID int64) error {
-	_, err := tx.Exec("DELETE FROM players WHERE team_id = $1", teamID)
-	if err != nil {
-		return fmt.Errorf("deletePlayers: %v", err)
-	}
-	return nil
 }
