@@ -73,7 +73,7 @@ VALUES
     ('Hieronim', 'Konopka', '1992-03-15', 'MALE', 4, 192, 85, 205, 'PG', (SELECT id FROM teams WHERE name = 'Kings')),
     ('Ludwik', 'Grzelak', '1993-11-05', 'MALE', 7, 198, 90, 210, 'SG', (SELECT id FROM teams WHERE name = 'Kings')),
     ('Janusz', 'Szewczyk', '1994-06-17', 'MALE', 12, 204, 94, 215, 'SF', (SELECT id FROM teams WHERE name = 'Kings')),
-    ('Bernard', 'Michałowski', '1995-09-28', 'MALE', 16, 208, 98, 220, 'PF', (SELECT id FROM teams WHERE name = 'Kings'))
+    ('Bernard', 'Michałowski', '1995-09-28', 'MALE', 16, 208, 98, 220, 'PF', (SELECT id FROM teams WHERE name = 'Kings')),
     ('Władysław', 'Stefański', '1991-01-14', 'MALE', 3, 191, 84, 200, 'PG', (SELECT id FROM teams WHERE name = 'Kangaroos')),
     ('Mieczysław', 'Matysiak', '1993-02-19', 'MALE', 8, 197, 90, 210, 'SG', (SELECT id FROM teams WHERE name = 'Kangaroos')),
     ('Rafał', 'Gawron', '1994-12-10', 'MALE', 11, 202, 93, 215, 'SF', (SELECT id FROM teams WHERE name = 'Kangaroos')),
