@@ -13,7 +13,7 @@ func (s *SQLStore) GetTeams() ([]model.TeamDTO, error) {
 		return fmt.Errorf("GetTeams: %v", err)
 	}
 
-	stmt, err := s.DB.Prepare("SELECT teams.id, teams.name, category.name, teams.email, teams.phone, cities FROM teams, categories, cities WHERE teams.categories_id = categories.id AND teams.cities_id = cities.id")
+	stmt, err := s.DB.Prepare("SELECT teams.id, teams.name, categories.name, teams.email, teams.phone, cities.name FROM teams, categories, cities WHERE teams.categories_id = categories.id AND teams.cities_id = cities.id")
 	if err != nil {
 		return nil, fail(fmt.Errorf("preparing statement: %v", err))
 	}
@@ -56,7 +56,7 @@ func (s *SQLStore) GetTeam(id int64) (*model.Team, error) {
 
 	var team model.Team
 
-	err := s.DB.QueryRow("SELECT teams.id, teams.name, category.name, teams.email, teams.phone, cities.name FROM teams, categories, cities WHERE teams.categories_id = categories.id AND teams.cities_id = cities.id AND id = $1", id).Scan(&team.ID,
+	err := s.DB.QueryRow("SELECT teams.id, teams.name, categories.name, teams.email, teams.phone, cities.name FROM teams, categories, cities WHERE teams.categories_id = categories.id AND teams.cities_id = cities.id AND id = $1", id).Scan(&team.ID,
 		&team.ID,
 		&team.Name,
 		&team.Category,
