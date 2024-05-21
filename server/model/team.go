@@ -16,12 +16,12 @@ type Team struct {
 
 // TeamDTO is a data transfer object for teams
 type TeamDTO struct {
-	ID       int64
-	Name     string
-	Category string
-	Email    string
-	Phone    string
-	City     string
+	ID       int64  `json:"id"`
+	Name     string `json:"name"`
+	Category string `json:"category"`
+	Email    string `json:"email"`
+	Phone    string `json:"phone"`
+	City     string `json:"city"`
 }
 
 type Player struct {
