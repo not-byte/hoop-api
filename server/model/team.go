@@ -6,12 +6,11 @@ type Team struct {
 	ID           int64
 	CitiesID     *int64
 	CategoriesID *int64
-	Category     int32
 	Name         string
+	Category     string
 	Email        string
 	Phone        string
-	Description  string
-	Gender       string
+	City         string
 	CreatedOn    time.Time
 }
 
