@@ -1,4 +1,5 @@
---> Drop tables
+DROP VIEW IF EXISTS categories_quota;
+
 DROP TABLE IF EXISTS teams_players;
 DROP TABLE IF EXISTS team_players;
 DROP TABLE IF EXISTS players;
