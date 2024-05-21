@@ -3,6 +3,7 @@ package store
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"tournament_api/server/model"
 	"tournament_api/server/types"
 )
