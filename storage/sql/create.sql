@@ -1,11 +1,9 @@
 BEGIN;
 
-
 CREATE TYPE IF NOT EXISTS position_enum AS ENUM ('PG', 'SG', 'SF', 'PF', 'C');
-CREATE TYPE IF NOT EXISTS category_enum AS ENUM ('U18', 'OPEN', 'OPEN_MALE');
+CREATE TYPE IF NOT EXISTS category_enum AS ENUM ('U18', 'OPEN');
 CREATE TYPE IF NOT EXISTS gender_enum AS ENUM ('MALE', 'FEMALE');
 CREATE TYPE IF NOT EXISTS account_enum AS ENUM ('PLAYER', 'REFEREE', 'ADMIN');
-
 
 CREATE TABLE IF NOT EXISTS permissions (
     id BIGINT NOT NULL UNIQUE DEFAULT unique_rowid() PRIMARY KEY,
@@ -19,12 +17,10 @@ CREATE TABLE IF NOT EXISTS accounts (
     email TEXT NOT NULL UNIQUE,
     password TEXT NOT NULL,
     mail_token TEXT NOT NULL,
-    created_on TIMESTAMP NOT NULL DEFAULT now(),
     logged_on TIMESTAMP,
     verified BOOLEAN NOT NULL DEFAULT false,
-    INDEX accounts_email (email),
-    INDEX accounts_verified (verified),
-    INDEX accounts_mail_token (mail_token) --> czy indexowanie 3 kolumn jest konieczne ?
+    created_on TIMESTAMP NOT NULL DEFAULT now(),
+    INDEX accounts_email (email)
 );
 
 CREATE TABLE IF NOT EXISTS cities (
@@ -37,10 +33,10 @@ CREATE TABLE IF NOT EXISTS cities (
 CREATE TABLE IF NOT EXISTS recoveries (
     id BIGINT NOT NULL UNIQUE DEFAULT unique_rowid() PRIMARY KEY,
     accounts_id BIGINT NOT NULL REFERENCES accounts (id) ON DELETE CASCADE,
-    created_on TIMESTAMP NOT NULL DEFAULT now(),
     recovered_on TIMESTAMP DEFAULT NULL,
     verified BOOLEAN NOT NULL DEFAULT false,
     verification_code TEXT NOT NULL UNIQUE,
+    created_on TIMESTAMP NOT NULL DEFAULT now(),
     INDEX accounts_verication_code (verification_code)
 );
 
@@ -55,14 +51,13 @@ CREATE TABLE IF NOT EXISTS categories (
 
 CREATE TABLE IF NOT EXISTS teams (
     id BIGINT NOT NULL UNIQUE DEFAULT unique_rowid() PRIMARY KEY,
-    cities_id BIGINT DEFAULT NULL REFERENCES cities (id) ON DELETE CASCADE,
     categories_id BIGINT DEFAULT NULL REFERENCES categories (id) ON DELETE CASCADE,
+    cities_id BIGINT DEFAULT NULL REFERENCES cities (id) ON DELETE CASCADE,
     category INT NOT NULL,    
     name TEXT NOT NULL UNIQUE,
     description TEXT DEFAULT NULL,
     email TEXT DEFAULT NULL,
     phone TEXT DEFAULT NULL,
-    gender gender_enum NOT NULL,
     created_on TIMESTAMP NOT NULL DEFAULT now(),
     INDEX teams_name (name)
 );
@@ -73,15 +68,15 @@ CREATE TABLE IF NOT EXISTS players (
     teams_id BIGINT DEFAULT NULL REFERENCES teams (id) ON DELETE CASCADE,
     first_name TEXT NOT NULL,
     last_name TEXT NOT NULL,
-    age SMALLINT NOT NULL,
     full_name TEXT AS (CONCAT(first_name, ' ', last_name)) STORED,
-    birthday TIMESTAMP,
+    birthday DATE,
     gender gender_enum NOT NULL,
     number SMALLINT NOT NULL,
     height SMALLINT NOT NULL,
-    weight SMALLINT NOT NULL DEFAULT 0,
-    wingspan SMALLINT NOT NULL DEFAULT 0,
+    weight SMALLINT NOT NULL,
+    wingspan SMALLINT NOT NULL,
     position position_enum NOT NULL,
+    created_on TIMESTAMP NOT NULL DEFAULT now(),
     UNIQUE (teams_id, number),
     INDEX players_number (number)
 );
@@ -94,10 +89,20 @@ CREATE TABLE IF NOT EXISTS teams_players (
 
 CREATE TABLE IF NOT EXISTS audits (
     id BIGINT NOT NULL UNIQUE DEFAULT unique_rowid() PRIMARY KEY,
-    time TIMESTAMP NOT NULL DEFAULT NOW(),
     status SMALLINT NOT NULL DEFAULT 0,
-    message TEXT NOT NULL
+    message TEXT NOT NULL,
+    created_on TIMESTAMP NOT NULL DEFAULT now()
 );
+
+CREATE VIEW IF NOT EXISTS categories_quota AS
+    SELECT categories.name AS name,
+        categories.gender AS gender,
+        count(teams.id) AS amount
+    FROM categories, teams
+    WHERE categories.id = teams.categories_id
+    GROUP BY categories.id,
+         categories.name,
+         categories.gender;
 
 COMMIT;
 

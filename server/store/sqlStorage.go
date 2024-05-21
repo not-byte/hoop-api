@@ -43,11 +43,52 @@ func NewSQLStore(config *types.AppConfig) (*SQLStore, error) {
 		return nil, fmt.Errorf("[STORE] Failed to initialize tables: %w", err)
 	}
 
+	if !config.PRODUCTION {
+		err = seed(db, "storage/sql/seed/categories.sql")
+		if err != nil {
+			db.Close()
+			return nil, fmt.Errorf("[STORE] Failed to seed tables: %w", err)
+		}
+
+		err = seed(db, "storage/sql/seed/cities.sql")
+		if err != nil {
+			db.Close()
+			return nil, fmt.Errorf("[STORE] Failed to seed tables: %w", err)
+		}
+
+		err = seed(db, "storage/sql/seed/teams.sql")
+		if err != nil {
+			db.Close()
+			return nil, fmt.Errorf("[STORE] Failed to seed tables: %w", err)
+		}
+
+		err = seed(db, "storage/sql/seed/players.sql")
+		if err != nil {
+			db.Close()
+			return nil, fmt.Errorf("[STORE] Failed to seed tables: %w", err)
+		}
+	}
+
 	return &SQLStore{DB: db}, nil
 }
 
+func clear(db *sql.DB) error {
+	content, err := os.ReadFile("storage/sql/clear.sql")
+	if err != nil {
+		fmt.Println("[STORE] Error reading file:", err)
+		return err
+	}
+
+	_, err = db.Exec(string(content))
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func initialize(db *sql.DB) error {
-	content, err := os.ReadFile("storage/sql/tables.sql")
+	content, err := os.ReadFile("storage/sql/create.sql")
 	if err != nil {
 		fmt.Println("Error reading file:", err)
 		return err
@@ -62,15 +103,16 @@ func initialize(db *sql.DB) error {
 	return nil
 }
 
-func clear(db *sql.DB) error {
-	content, err := os.ReadFile("storage/sql/clear_tables.sql")
+func seed(db *sql.DB, file string) error {
+	content, err := os.ReadFile(file)
 	if err != nil {
-		fmt.Println("[STORE] Error reading file:", err)
+		fmt.Println("Error reading file:", err)
 		return err
 	}
 
 	_, err = db.Exec(string(content))
 	if err != nil {
+		fmt.Println("[STORE] Error executing seeding of tables:", err)
 		return err
 	}
 

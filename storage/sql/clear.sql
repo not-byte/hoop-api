@@ -11,7 +11,6 @@ DROP TABLE IF EXISTS cities;
 DROP TABLE IF EXISTS audits;
 DROP TABLE IF EXISTS categories;
 
---> drop customs types
 DROP TYPE IF EXISTS position_enum;
 DROP TYPE IF EXISTS account_enum;
 DROP TYPE IF EXISTS category_enum;
