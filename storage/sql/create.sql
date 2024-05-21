@@ -53,7 +53,6 @@ CREATE TABLE IF NOT EXISTS teams (
     id BIGINT NOT NULL UNIQUE DEFAULT unique_rowid() PRIMARY KEY,
     categories_id BIGINT DEFAULT NULL REFERENCES categories (id) ON DELETE CASCADE,
     cities_id BIGINT DEFAULT NULL REFERENCES cities (id) ON DELETE CASCADE,
-    category INT NOT NULL,    
     name TEXT NOT NULL UNIQUE,
     description TEXT DEFAULT NULL,
     email TEXT DEFAULT NULL,
