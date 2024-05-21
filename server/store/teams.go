@@ -36,7 +36,7 @@ func (s *SQLStore) GetTeams() ([]model.TeamDTO, error) {
 			&team.Category,
 			&team.Email,
 			&team.Phone,
-			&team.City
+			&team.City,
 		); err != nil {
 			return nil, fail(fmt.Errorf("scanning results: %v", err))
 		}
