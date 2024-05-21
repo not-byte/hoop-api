@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"tournament_api/server/model"
 	"tournament_api/server/types"
-	"tournament_api/server/utils"
 )
 
 func (s *SQLStore) GetTeams() ([]model.TeamDTO, error) {
