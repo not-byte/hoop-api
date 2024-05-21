@@ -51,7 +51,7 @@ func (s *Server) Start() error {
 	//playersRouter.Use(s.TokenRefreshMiddleware, s.AuthenticateMiddleware)
 	playersRouter.HandleFunc("", s.handleGetAllPlayers).Methods("GET")
 
-	http.Handle("/v1/", rootRouter)
+	http.Handle("/v1", rootRouter)
 
 	return http.ListenAndServe(s.listenAddr, nil)
 }
