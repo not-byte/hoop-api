@@ -97,6 +97,6 @@ VALUES
     ('Hubert', 'Zielonka', '1992-07-09', 'MALE', 3, 191, 84, 200, 'PG', (SELECT id FROM teams WHERE name = 'Raptors')),
     ('Gustaw', 'Biel', '1993-12-07', 'MALE', 9, 197, 90, 210, 'SG', (SELECT id FROM teams WHERE name = 'Raptors')),
     ('Marian', 'Bieńkowski', '1994-11-04', 'MALE', 11, 202, 93, 215, 'SF', (SELECT id FROM teams WHERE name = 'Raptors')),
-    ('Tadeusz', 'Miś', '1995-06-17', 'MALE', 15, 209, 99, 220, 'PF', (SELECT id FROM teams WHERE name = 'Rapto)rs');
+    ('Tadeusz', 'Miś', '1995-06-17', 'MALE', 15, 209, 99, 220, 'PF', (SELECT id FROM teams WHERE name = 'Raptors'));
 
 COMMIT;
