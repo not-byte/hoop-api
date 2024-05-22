@@ -13,7 +13,7 @@ func (s *SQLStore) GetTeams() ([]model.TeamDTO, error) {
 		return fmt.Errorf("GetTeams: %v", err)
 	}
 
-	stmt, err := s.DB.Prepare("SELECT teams.id, teams.name, categories.name, teams.email, teams.phone, cities.name FROM teams, categories, cities WHERE teams.categories_id = categories.id AND teams.cities_id = cities.id")
+	stmt, err := s.DB.Prepare("SELECT teams.id, categories.id, cities.id, teams.name, teams.email, teams.phone FROM teams, categories, cities WHERE teams.categories_id = categories.id AND teams.cities_id = cities.id")
 	if err != nil {
 		return nil, fail(fmt.Errorf("preparing statement: %v", err))
 	}
@@ -31,11 +31,11 @@ func (s *SQLStore) GetTeams() ([]model.TeamDTO, error) {
 		var team model.TeamDTO
 		if err := rows.Scan(
 			&team.ID,
+			&team.CategoryID,
+			&team.CityID,
 			&team.Name,
-			&team.Category,
 			&team.Email,
 			&team.Phone,
-			&team.City,
 		); err != nil {
 			return nil, fail(fmt.Errorf("scanning results: %v", err))
 		}
