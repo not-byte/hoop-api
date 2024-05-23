@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"math/big"
 	"tournament_api/server/model"
 	"tournament_api/server/types"
 )
@@ -42,10 +41,6 @@ func (s *SQLStore) GetTeams() ([]model.TeamDTO, error) {
 			return nil, fail(fmt.Errorf("scanning results: %v", err))
 		}
 
-		team.ID, _ = new(big.Int).SetString(idStr, 10)
-		team.CategoryID, _ = new(big.Int).SetString(categoryIDStr, 10)
-		team.CityID, _ = new(big.Int).SetString(cityIDStr, 10)
-
 		teams = append(teams, team)
 	}
 
@@ -56,7 +51,7 @@ func (s *SQLStore) GetTeams() ([]model.TeamDTO, error) {
 	return teams, nil
 }
 
-func (s *SQLStore) GetTeam(id big.Int) (*model.TeamDTO, error) {
+func (s *SQLStore) GetTeam(id uint64) (*model.TeamDTO, error) {
 	fail := func(err error) error {
 		return fmt.Errorf("GetTeam: %v", err)
 	}
@@ -135,7 +130,7 @@ func (s *SQLStore) UpdateTeam(team *types.Team) error {
 	return nil
 }
 
-func (s *SQLStore) DeleteTeam(id big.Int) error {
+func (s *SQLStore) DeleteTeam(id uint64) error {
 	_, err := s.DB.Exec("DELETE FROM teams WHERE id = $1", id)
 	if err != nil {
 		return fmt.Errorf("DeleteTeam: %v", err)
@@ -143,8 +138,8 @@ func (s *SQLStore) DeleteTeam(id big.Int) error {
 	return nil
 }
 
-func insertTeam(tx *sql.Tx, team *types.Team) (*big.Int, error) {
-	var id big.Int
+func insertTeam(tx *sql.Tx, team *types.Team) (*uint64, error) {
+	var id uint64
 	if err := tx.QueryRow(
 		"INSERT INTO teams (name, email, description, phone, gender, category) VALUES ($1, $2, $3, $4, $5, $6) ON CONFLICT DO NOTHING RETURNING ID",
 		team.Name, team.Email, team.Description, team.Phone, team.Gender, team.Category,

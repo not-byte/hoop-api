@@ -1,15 +1,14 @@
 package model
 
 import (
-	"math/big"
 	"time"
 )
 
 type Account struct {
 	Email         string
 	Password      string
-	ID            big.Int
-	PermissionsID big.Int
+	ID            uint64
+	PermissionsID uint64
 	CreatedOn     time.Time
 	LoggedOn      time.Time
 	Verified      bool
@@ -17,6 +16,6 @@ type Account struct {
 }
 
 type AccountPermission struct {
-	PermissionsID big.Int
-	AccountsID    big.Int
+	PermissionsID uint64
+	AccountsID    uint64
 }

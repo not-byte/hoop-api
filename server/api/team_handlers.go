@@ -3,7 +3,6 @@ package api
 import (
 	"encoding/json"
 	"fmt"
-	"math/big"
 	"net/http"
 	"tournament_api/server/model"
 	"tournament_api/server/types"
@@ -26,7 +25,7 @@ func (s *Server) handleGetTeam(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	idStr := vars["id"]
 
-	id := new(big.Int)
+	id := new(uint64)
 	_, err := fmt.Sscan(idStr, id)
 	if err != nil {
 		fmt.Println(err)

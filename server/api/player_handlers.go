@@ -3,7 +3,6 @@ package api
 import (
 	"encoding/json"
 	"fmt"
-	"math/big"
 	"net/http"
 	"tournament_api/server/model"
 
@@ -15,7 +14,7 @@ func (s *Server) handleGetTeamPlayers(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	idStr := vars["id"]
 
-	id := new(big.Int)
+	id := new(uint64)
 	_, err := fmt.Sscan(idStr, id)
 	if err != nil {
 		http.Error(w, "Invalid team ID "+err.Error(), http.StatusBadRequest)

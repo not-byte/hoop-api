@@ -2,6 +2,7 @@ package api
 
 import (
 	"net/http"
+	"fmt"
 	"tournament_api/server/store"
 	"tournament_api/server/types"
 
@@ -23,8 +24,8 @@ func NewServer(listenAddr string, store store.Store, config *types.AppConfig) *S
 }
 
 func (s *Server) Start() error {
-	rootRouter := mux.NewRouter()
-
+	rootRoute := fmt.Sprintf("/v%d", s.config.VERSION)
+	rootRouter := mux.NewRouter().PathPrefix(rootRoute).Subrouter()
 	rootRouter.Use(s.HeadersMiddleware)
 
 	if s.config.PRODUCTION {

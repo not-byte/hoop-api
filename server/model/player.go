@@ -1,12 +1,11 @@
 package model
 
 import (
-	"math/big"
 	"time"
 )
 
 type PlayerDTO struct {
-	ID        big.Int   `json:"id"`
+	ID        uint64    `json:"id"`
 	FirstName string    `json:"first_name"`
 	LastName  string    `json:"last_name"`
 	Age       int8      `json:"age"`
@@ -19,9 +18,9 @@ type PlayerDTO struct {
 }
 
 type Player struct {
-	ID         big.Int
-	AccountsID big.Int
-	TeamsID    big.Int
+	ID         uint64
+	AccountsID uint64
+	TeamsID    uint64
 	FirstName  string
 	LastName   string
 	FullName   string
@@ -36,6 +35,6 @@ type Player struct {
 }
 
 type TeamPlayer struct {
-	TeamsID   big.Int
-	PlayersID big.Int
+	TeamsID   uint64
+	PlayersID uint64
 }

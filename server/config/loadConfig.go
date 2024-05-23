@@ -24,6 +24,7 @@ func LoadConfig() (*types.AppConfig, error) {
 		JWT_REFRESH_SECRET:                getEnv("JWT_REFRESH_SECRET", "not-so-secret-now-is-it?"),
 		JWT_ACCESS_EXPIRATION_IN_SECONDS:  getEnvAsInt("JWT_ACCESS_EXPIRATION_IN_SECONDS", 600),         //10 minutes
 		JWT_REFRESH_EXPIRATION_IN_SECONDS: getEnvAsInt("JWT_REFRESH_EXPIRATION_IN_SECONDS", 3600*24*14), //14 days
+		VERSION:                           getEnvAsInt("VERSION", 1),
 	}
 
 	return config, nil

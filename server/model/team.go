@@ -1,23 +1,22 @@
 package model
 
 import (
-	"math/big"
 	"time"
 )
 
 type TeamDTO struct {
-	ID         big.Int `json:"id"`
-	CategoryID big.Int `json:"category_id"`
-	CityID     big.Int `json:"city_id"`
-	Name       string  `json:"name"`
-	Email      string  `json:"email"`
-	Phone      string  `json:"phone"`
+	ID         uint64 `json:"id"`
+	CategoryID uint64 `json:"category_id"`
+	CityID     uint64 `json:"city_id"`
+	Name       string `json:"name"`
+	Email      string `json:"email"`
+	Phone      string `json:"phone"`
 }
 
 type Team struct {
-	ID           big.Int
-	CitiesID     big.Int
-	CategoriesID big.Int
+	ID           uint64
+	CitiesID     uint64
+	CategoriesID uint64
 	Name         string
 	Category     string
 	Email        string

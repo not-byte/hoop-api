@@ -1,16 +1,14 @@
 package model
 
-import "math/big"
-
 type CategoryDTO struct {
-	ID     big.Int `json:"id"`
-	Name   string  `json:"name"`
-	Gender string  `json:"gender"`
+	ID     uint64 `json:"id"`
+	Name   string `json:"name"`
+	Gender string `json:"gender"`
 }
 
 type Category struct {
-	ID        big.Int
-	TeamLimit big.Int
+	ID        uint64
+	TeamLimit uint64
 	Name      string
 	Gender    string
 }

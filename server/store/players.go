@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"math/big"
 	"tournament_api/server/model"
 	"tournament_api/server/types"
 	"tournament_api/server/utils"
@@ -51,7 +50,7 @@ func (store *SQLStore) GetPlayers() ([]model.PlayerDTO, error) {
 	return players, nil
 }
 
-func insertPlayers(tx *sql.Tx, players []*types.Player, team_id *big.Int) error {
+func insertPlayers(tx *sql.Tx, players []*types.Player, team_id *uint64) error {
 	for _, player := range players {
 		player.TeamID = team_id
 	}
@@ -69,7 +68,7 @@ func insertPlayers(tx *sql.Tx, players []*types.Player, team_id *big.Int) error 
 	return nil
 }
 
-func deletePlayers(tx *sql.Tx, teamID big.Int) error {
+func deletePlayers(tx *sql.Tx, teamID uint64) error {
 	_, err := tx.Exec("DELETE FROM players WHERE team_id = $1", teamID)
 	if err != nil {
 		return fmt.Errorf("deletePlayers: %v", err)
@@ -77,7 +76,7 @@ func deletePlayers(tx *sql.Tx, teamID big.Int) error {
 	return nil
 }
 
-func (store *SQLStore) GetPlayer(id big.Int) (*model.PlayerDTO, error) {
+func (store *SQLStore) GetPlayer(id uint64) (*model.PlayerDTO, error) {
 	fail := func(err error) error {
 		return err
 	}
@@ -104,6 +103,6 @@ func (s *SQLStore) UpdatePlayer(player *types.Player) error {
 	return nil
 }
 
-func (s *SQLStore) DeletePlayer(id big.Int) error {
+func (s *SQLStore) DeletePlayer(id uint64) error {
 	return nil
 }

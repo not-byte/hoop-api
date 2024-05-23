@@ -1,15 +1,13 @@
 package model
 
-import "math/big"
-
 type CityDTO struct {
-	ID    big.Int `json:"id"`
-	Name  string  `json:"name"`
-	State string  `json:"state"`
+	ID    uint64 `json:"id"`
+	Name  string `json:"name"`
+	State string `json:"state"`
 }
 
 type City struct {
-	ID    big.Int
+	ID    uint64
 	Name  string
 	State string
 }

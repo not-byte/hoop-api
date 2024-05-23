@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"math/big"
 	"tournament_api/server/model"
 )
 
@@ -93,7 +92,7 @@ func (s *SQLStore) UpdateAccount(account *model.Account) error {
 	return nil
 }
 
-func (s *SQLStore) LoginAccount(id big.Int) error {
+func (s *SQLStore) LoginAccount(id uint64) error {
 	stmt, err := s.DB.Prepare("UPDATE accounts SET logged_on = now() WHERE id = $1")
 	if err != nil {
 		return fmt.Errorf("LoginAccount: preparing update statement: %v", err)
@@ -116,7 +115,7 @@ func (s *SQLStore) LoginAccount(id big.Int) error {
 	return nil
 }
 
-func (s *SQLStore) VerifyAccount(id big.Int) error {
+func (s *SQLStore) VerifyAccount(id uint64) error {
 	stmt, err := s.DB.Prepare("UPDATE accounts SET verified = $1 WHERE id = $2")
 	if err != nil {
 		return fmt.Errorf("VerifyAccount: preparing statement: %v", err)
@@ -139,7 +138,7 @@ func (s *SQLStore) VerifyAccount(id big.Int) error {
 	return nil
 }
 
-func (s *SQLStore) DeleteAccount(id big.Int) error {
+func (s *SQLStore) DeleteAccount(id uint64) error {
 	stmt, err := s.DB.Prepare("DELETE FROM accounts WHERE id = $1")
 	if err != nil {
 		return fmt.Errorf("DeleteAccount: preparing statement: %v", err)
