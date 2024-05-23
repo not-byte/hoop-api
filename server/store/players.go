@@ -4,34 +4,25 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"math/big"
 	"tournament_api/server/model"
 	"tournament_api/server/types"
 	"tournament_api/server/utils"
 )
 
-func (store *SQLStore) GetPlayers(teamID int64) ([]model.PlayerDTO, error) {
+func (store *SQLStore) GetPlayers() ([]model.PlayerDTO, error) {
 	var (
 		stmt *sql.Stmt
 		rows *sql.Rows
 		err  error
 	)
 
-	if teamID == -1 {
-		stmt, err = store.DB.Prepare("SELECT id, first_name, last_name, age FROM players")
-		if err != nil {
-			return nil, err
-		}
-		defer stmt.Close()
-
-		rows, err = stmt.Query()
-	} else {
-		stmt, err = store.DB.Prepare("SELECT id, first_name, last_name, age FROM players WHERE teams_id = $1")
-		if err != nil {
-			return nil, err
-		}
-		defer stmt.Close()
-		rows, err = stmt.Query(teamID)
+	stmt, err = store.DB.Prepare("SELECT id, first_name, last_name, age FROM players")
+	if err != nil {
+		return nil, err
 	}
+	defer stmt.Close()
+	rows, err = stmt.Query()
 
 	if err != nil {
 		return nil, err
@@ -60,7 +51,7 @@ func (store *SQLStore) GetPlayers(teamID int64) ([]model.PlayerDTO, error) {
 	return players, nil
 }
 
-func insertPlayers(tx *sql.Tx, players []*types.Player, team_id int64) error {
+func insertPlayers(tx *sql.Tx, players []*types.Player, team_id *big.Int) error {
 	for _, player := range players {
 		player.TeamID = team_id
 	}
@@ -78,7 +69,7 @@ func insertPlayers(tx *sql.Tx, players []*types.Player, team_id int64) error {
 	return nil
 }
 
-func deletePlayers(tx *sql.Tx, teamID int64) error {
+func deletePlayers(tx *sql.Tx, teamID big.Int) error {
 	_, err := tx.Exec("DELETE FROM players WHERE team_id = $1", teamID)
 	if err != nil {
 		return fmt.Errorf("deletePlayers: %v", err)
@@ -86,7 +77,7 @@ func deletePlayers(tx *sql.Tx, teamID int64) error {
 	return nil
 }
 
-func (store *SQLStore) GetPlayer(id int64) (*model.PlayerDTO, error) {
+func (store *SQLStore) GetPlayer(id big.Int) (*model.PlayerDTO, error) {
 	fail := func(err error) error {
 		return err
 	}
@@ -113,6 +104,6 @@ func (s *SQLStore) UpdatePlayer(player *types.Player) error {
 	return nil
 }
 
-func (s *SQLStore) DeletePlayer(id int64) error {
+func (s *SQLStore) DeletePlayer(id big.Int) error {
 	return nil
 }

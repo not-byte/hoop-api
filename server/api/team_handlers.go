@@ -3,8 +3,8 @@ package api
 import (
 	"encoding/json"
 	"fmt"
+	"math/big"
 	"net/http"
-	"strconv"
 	"tournament_api/server/model"
 	"tournament_api/server/types"
 
@@ -23,29 +23,29 @@ func (s *Server) handleGetAllTeams(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) handleGetTeam(w http.ResponseWriter, r *http.Request) {
-
 	vars := mux.Vars(r)
 	idStr := vars["id"]
 
-	id, err := strconv.ParseInt(idStr, 10, 64)
+	id := new(big.Int)
+	_, err := fmt.Sscan(idStr, id)
 	if err != nil {
+		fmt.Println(err)
 		http.Error(w, "Invalid team ID"+err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	team, err := s.store.GetTeam(id)
+	team, err := s.store.GetTeam(*id)
 	if err != nil {
 		fmt.Println(err)
 		http.Error(w, "Invalid login credentials "+err.Error(), http.StatusUnauthorized)
 		return
 	}
 	if team == nil {
-		http.Error(w, "Team not found "+err.Error(), http.StatusUnauthorized)
+		http.Error(w, "Team not found "+err.Error(), http.StatusNotFound)
 		return
-
 	}
 
-	json.NewEncoder(w).Encode(map[string]model.Team{"team": *team})
+	json.NewEncoder(w).Encode(map[string]model.TeamDTO{"team": *team})
 }
 
 func (s *Server) handleTeamCreation(w http.ResponseWriter, r *http.Request) {

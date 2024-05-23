@@ -1,21 +1,18 @@
 package model
 
-import "time"
+import (
+	"math/big"
+	"time"
+)
 
 type Permission struct {
-	ID    int64
+	ID    big.Int
 	Type  string
 	Flags int
 }
 
-type City struct {
-	ID    int64
-	Name  string
-	State string
-}
-
 type Audit struct {
-	ID      int64
+	ID      big.Int
 	Time    time.Time
 	Status  int
 	Message string
