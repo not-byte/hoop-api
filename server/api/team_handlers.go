@@ -27,7 +27,7 @@ func (s *Server) handleGetTeam(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	idStr := vars["id"]
 
-	id, err := strconv.ParseInt(idStr, 10, 64)
+	id, err := strconv.ParseUint(idStr, 10, 64)
 	if err != nil {
 		http.Error(w, "Invalid team ID"+err.Error(), http.StatusBadRequest)
 		return

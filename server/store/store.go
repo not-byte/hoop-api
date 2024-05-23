@@ -16,14 +16,14 @@ type Store interface {
 	GetAccounts() ([]model.Account, error)
 
 	GetTeams() ([]model.TeamDTO, error)
-	GetTeam(id int64) (*model.Team, error)
+	GetTeam(id uint64) (*model.Team, error)
 	CreateTeam(ctx context.Context, team *types.Team) error
 	UpdateTeam(team *types.Team) error
-	DeleteTeam(id int64) error
+	DeleteTeam(id uint64) error
 
-	GetPlayers(team_id int64) ([]model.PlayerDTO, error)
-	GetPlayer(id int64) (*model.PlayerDTO, error)
+	GetPlayers(team_id uint64) ([]model.PlayerDTO, error)
+	GetPlayer(id uint64) (*model.PlayerDTO, error)
 	CreatePlayer(ctx context.Context, player *types.Player) error
 	UpdatePlayer(player *types.Player) error
-	DeletePlayer(id int64) error
+	DeletePlayer(id uint64) error
 }

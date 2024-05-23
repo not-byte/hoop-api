@@ -49,7 +49,7 @@ func (s *SQLStore) GetTeams() ([]model.TeamDTO, error) {
 	return teams, nil
 }
 
-func (s *SQLStore) GetTeam(id int64) (*model.Team, error) {
+func (s *SQLStore) GetTeam(id uint64) (*model.Team, error) {
 	fail := func(err error) error {
 		return fmt.Errorf("GetTeam: %v", err)
 	}
@@ -89,7 +89,7 @@ func (s *SQLStore) CreateTeam(ctx context.Context, team *types.Team) error {
 		return fmt.Errorf("CreateTeam: %v", err)
 	}
 
-	if err := insertPlayers(tx, team.Players, int64(*id)); err != nil {
+	if err := insertPlayers(tx, team.Players, uint64(*id)); err != nil {
 		return fmt.Errorf("CreateTeam: %v", err)
 	}
 
@@ -117,7 +117,7 @@ func (s *SQLStore) UpdateTeam(team *types.Team) error {
 		return fmt.Errorf("UpdateTeam: %v", err)
 	}
 
-	if err := insertPlayers(tx, team.Players, int64(*team.ID)); err != nil {
+	if err := insertPlayers(tx, team.Players, uint64(*team.ID)); err != nil {
 		return fmt.Errorf("UpdateTeam: %v", err)
 	}
 
@@ -128,7 +128,7 @@ func (s *SQLStore) UpdateTeam(team *types.Team) error {
 	return nil
 }
 
-func (s *SQLStore) DeleteTeam(id int64) error {
+func (s *SQLStore) DeleteTeam(id uint64) error {
 	_, err := s.DB.Exec("DELETE FROM teams WHERE id = $1", id)
 	if err != nil {
 		return fmt.Errorf("DeleteTeam: %v", err)
