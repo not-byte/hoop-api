@@ -95,14 +95,14 @@ func (store *SQLStore) GetPlayer(id uint64) (*model.PlayerDTO, error) {
 	return &player, nil
 }
 
-func (s *SQLStore) CreatePlayer(ctx context.Context, player *types.Player) error {
+func (store *SQLStore) CreatePlayer(ctx context.Context, player *model.Player) error {
 	return nil
 }
 
-func (s *SQLStore) UpdatePlayer(player *types.Player) error {
+func (store *SQLStore) UpdatePlayer(player *model.Player) error {
 	return nil
 }
 
-func (s *SQLStore) DeletePlayer(id uint64) error {
+func (store *SQLStore) DeletePlayer(id uint64) error {
 	return nil
 }

@@ -3,12 +3,10 @@ package api
 import (
 	"encoding/json"
 	"fmt"
-	"net/http"
-	"tournament_api/server/model"
-	"tournament_api/server/types"
-
 	"github.com/go-playground/validator/v10"
 	"github.com/gorilla/mux"
+	"net/http"
+	"tournament_api/server/model"
 )
 
 func (s *Server) handleGetAllTeams(w http.ResponseWriter, r *http.Request) {
@@ -49,7 +47,7 @@ func (s *Server) handleGetTeam(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) handleTeamCreation(w http.ResponseWriter, r *http.Request) {
 
-	var team types.Team
+	var team model.Team
 	err := json.NewDecoder(r.Body).Decode(&team)
 	if err != nil {
 		http.Error(w, "Error while decoding: "+err.Error(), http.StatusInternalServerError)

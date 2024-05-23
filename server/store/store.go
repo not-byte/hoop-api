@@ -3,7 +3,6 @@ package store
 import (
 	"context"
 	"tournament_api/server/model"
-	"tournament_api/server/types"
 )
 
 type Store interface {
@@ -17,13 +16,13 @@ type Store interface {
 
 	GetTeams() ([]model.TeamDTO, error)
 	GetTeam(id uint64) (*model.TeamDTO, error)
-	CreateTeam(ctx context.Context, team *types.Team) error
-	UpdateTeam(team *types.Team) error
+	CreateTeam(ctx context.Context, team *model.Team) error
+	UpdateTeam(team *model.Team) error
 	DeleteTeam(id uint64) error
 
 	GetPlayers() ([]model.PlayerDTO, error)
 	GetPlayer(id uint64) (*model.PlayerDTO, error)
-	CreatePlayer(ctx context.Context, player *types.Player) error
-	UpdatePlayer(player *types.Player) error
+	CreatePlayer(ctx context.Context, player *model.Player) error
+	UpdatePlayer(player *model.Player) error
 	DeletePlayer(id uint64) error
 }

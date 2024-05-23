@@ -5,15 +5,14 @@ import (
 	"database/sql"
 	"fmt"
 	"tournament_api/server/model"
-	"tournament_api/server/types"
 )
 
-func (s *SQLStore) GetTeams() ([]model.TeamDTO, error) {
+func (store *SQLStore) GetTeams() ([]model.TeamDTO, error) {
 	fail := func(err error) error {
 		return fmt.Errorf("GetTeams: %v", err)
 	}
 
-	stmt, err := s.DB.Prepare("SELECT teams.id, categories.id, cities.id, teams.name, teams.email, teams.phone FROM teams, categories, cities WHERE teams.categories_id = categories.id AND teams.cities_id = cities.id")
+	stmt, err := store.DB.Prepare("SELECT teams.id, categories.id, cities.id, teams.name, teams.email, teams.phone FROM teams, categories, cities WHERE teams.categories_id = categories.id AND teams.cities_id = cities.id")
 	if err != nil {
 		return nil, fail(fmt.Errorf("preparing statement: %v", err))
 	}
@@ -28,12 +27,12 @@ func (s *SQLStore) GetTeams() ([]model.TeamDTO, error) {
 	var teams []model.TeamDTO
 
 	for rows.Next() {
-		var idStr, categoryIDStr, cityIDStr string
 		var team model.TeamDTO
+
 		if err := rows.Scan(
-			&idStr,
-			&categoryIDStr,
-			&cityIDStr,
+			&team.ID,
+			&team.CategoryID,
+			&team.CityID,
 			&team.Name,
 			&team.Email,
 			&team.Phone,
@@ -51,14 +50,14 @@ func (s *SQLStore) GetTeams() ([]model.TeamDTO, error) {
 	return teams, nil
 }
 
-func (s *SQLStore) GetTeam(id uint64) (*model.TeamDTO, error) {
+func (store *SQLStore) GetTeam(id uint64) (*model.TeamDTO, error) {
 	fail := func(err error) error {
 		return fmt.Errorf("GetTeam: %v", err)
 	}
 
 	var team model.TeamDTO
 
-	err := s.DB.QueryRow("SELECT teams.id, categories.id, cities.id, teams.name, teams.email, teams.phone FROM teams, categories, cities WHERE teams.categories_id = categories.id AND teams.cities_id = cities.id AND teams.id = $1", id).Scan(
+	err := store.DB.QueryRow("SELECT teams.id, categories.id, cities.id, teams.name, teams.email, teams.phone FROM teams, categories, cities WHERE teams.categories_id = categories.id AND teams.cities_id = cities.id AND teams.id = $1", id).Scan(
 		&team.ID,
 		&team.CategoryID,
 		&team.CityID,
@@ -76,8 +75,8 @@ func (s *SQLStore) GetTeam(id uint64) (*model.TeamDTO, error) {
 	return &team, nil
 }
 
-func (s *SQLStore) CreateTeam(ctx context.Context, team *types.Team) error {
-	tx, err := s.DB.BeginTx(ctx, nil)
+func (store *SQLStore) CreateTeam(ctx context.Context, team *model.Team) error {
+	tx, err := store.DB.BeginTx(ctx, nil)
 	if err != nil {
 		return fmt.Errorf("CreateTeam: starting transaction: %v", err)
 	}
@@ -91,9 +90,9 @@ func (s *SQLStore) CreateTeam(ctx context.Context, team *types.Team) error {
 		return fmt.Errorf("CreateTeam: %v", err)
 	}
 
-	if err := insertPlayers(tx, team.Players, id); err != nil {
-		return fmt.Errorf("CreateTeam: %v", err)
-	}
+	//if err := insertPlayers(tx, team.Players, id); err != nil {
+	//	return fmt.Errorf("CreateTeam: %v", err)
+	//}
 
 	if err := tx.Commit(); err != nil {
 		return fmt.Errorf("CreateTeam: committing transaction: %v", err)
@@ -102,50 +101,50 @@ func (s *SQLStore) CreateTeam(ctx context.Context, team *types.Team) error {
 	return nil
 }
 
-func (s *SQLStore) UpdateTeam(team *types.Team) error {
-	tx, err := s.DB.BeginTx(context.Background(), nil)
-	if err != nil {
-		return fmt.Errorf("UpdateTeam: starting transaction: %v", err)
-	}
-	defer tx.Rollback()
-
-	_, err = tx.Exec("UPDATE teams SET name = $1, email = $2, description = $3, phone = $4, gender = $5 WHERE id = $6",
-		team.Name, team.Email, team.Description, team.Phone, team.Gender, team.ID)
-	if err != nil {
-		return fmt.Errorf("UpdateTeam: %v", err)
-	}
-
-	if err := deletePlayers(tx, *team.ID); err != nil {
-		return fmt.Errorf("UpdateTeam: %v", err)
-	}
-
-	if err := insertPlayers(tx, team.Players, team.ID); err != nil {
-		return fmt.Errorf("UpdateTeam: %v", err)
-	}
-
-	if err := tx.Commit(); err != nil {
-		return fmt.Errorf("UpdateTeam: committing transaction: %v", err)
-	}
+func (store *SQLStore) UpdateTeam(team *model.Team) error {
+	//tx, err := store.DB.BeginTx(context.Background(), nil)
+	//if err != nil {
+	//	return fmt.Errorf("UpdateTeam: starting transaction: %v", err)
+	//}
+	//defer tx.Rollback()
+	//
+	//_, err = tx.Exec("UPSERT teams SET name =  email =$1, $2, $3, description = phone = $4 WHERE id = $5",
+	//	team.Name, team.Email, team.Description, team.Phone, team.ID)
+	//if err != nil {
+	//	return fmt.Errorf("UpdateTeam: %v", err)
+	//}
+	//
+	//if err := deletePlayers(tx, *team.ID); err != nil {
+	//	return fmt.Errorf("UpdateTeam: %v", err)
+	//}
+	//
+	//if err := insertPlayers(tx, team.Players, team.ID); err != nil {
+	//	return fmt.Errorf("UpdateTeam: %v", err)
+	//}
+	//
+	//if err := tx.Commit(); err != nil {
+	//	return fmt.Errorf("UpdateTeam: committing transaction: %v", err)
+	//}
 
 	return nil
 }
 
-func (s *SQLStore) DeleteTeam(id uint64) error {
-	_, err := s.DB.Exec("DELETE FROM teams WHERE id = $1", id)
+func (store *SQLStore) DeleteTeam(id uint64) error {
+	_, err := store.DB.Exec("DELETE FROM teams WHERE id = $1", id)
 	if err != nil {
 		return fmt.Errorf("DeleteTeam: %v", err)
 	}
 	return nil
 }
 
-func insertTeam(tx *sql.Tx, team *types.Team) (*uint64, error) {
+func insertTeam(tx *sql.Tx, team *model.Team) (*uint64, error) {
 	var id uint64
-	if err := tx.QueryRow(
-		"INSERT INTO teams (name, email, description, phone, gender, category) VALUES ($1, $2, $3, $4, $5, $6) ON CONFLICT DO NOTHING RETURNING ID",
-		team.Name, team.Email, team.Description, team.Phone, team.Gender, team.Category,
-	).Scan(&id); err != nil {
-		return nil, fmt.Errorf("inserting team : %v", err)
-	}
+	//if err := tx.QueryRow(
+	//	"INSERT INTO teams (name, email, description, phone, categories_id, cities_id) VALUES ($1, $2, $3, $4, $5, $6) ON CONFLICT DO NOTHING RETURNING ID",
+	//	team.Name, team.Email, team.Description, team.Phone, team.Gender, team.Category,
+	//).Scan(&id); err != nil {
+	//	return nil, fmt.Errorf("inserting team : %v", err)
+	//}
 
 	return &id, nil
 }
