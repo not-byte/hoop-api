@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"fmt"
 	"tournament_api/server/model"
-	"tournament_api/server/types"
 	"tournament_api/server/utils"
 )
 
@@ -50,9 +49,9 @@ func (store *SQLStore) GetPlayers() ([]model.PlayerDTO, error) {
 	return players, nil
 }
 
-func insertPlayers(tx *sql.Tx, players []*types.Player, team_id *uint64) error {
+func insertPlayers(tx *sql.Tx, players []*model.Player, teams_id *uint64) error {
 	for _, player := range players {
-		player.TeamID = team_id
+		player.TeamsID = *teams_id
 	}
 	query, err := utils.BulkInsert(players, "players")
 	if err != nil {

@@ -9,7 +9,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func (s *Server) handleGetTeamPlayers(w http.ResponseWriter, r *http.Request) {
+func (server *Server) handleGetTeamPlayers(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
 	idStr := vars["id"]
@@ -22,7 +22,7 @@ func (s *Server) handleGetTeamPlayers(w http.ResponseWriter, r *http.Request) {
 
 	}
 
-	players, err := s.store.GetPlayers()
+	players, err := server.store.GetPlayers()
 	if err != nil {
 		http.Error(w, "Error while fetching players "+err.Error(), http.StatusInternalServerError)
 		return
@@ -31,9 +31,9 @@ func (s *Server) handleGetTeamPlayers(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string][]model.PlayerDTO{"players": players})
 }
 
-func (s *Server) handleGetAllPlayers(w http.ResponseWriter, r *http.Request) {
+func (server *Server) handleGetAllPlayers(w http.ResponseWriter, r *http.Request) {
 
-	players, err := s.store.GetPlayers()
+	players, err := server.store.GetPlayers()
 	if err != nil {
 		http.Error(w, "Error while fetching players "+err.Error(), http.StatusInternalServerError)
 		return

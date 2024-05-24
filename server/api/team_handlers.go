@@ -3,23 +3,24 @@ package api
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/go-playground/validator/v10"
-	"github.com/gorilla/mux"
 	"net/http"
 	"tournament_api/server/model"
+
+	"github.com/go-playground/validator/v10"
+	"github.com/gorilla/mux"
 )
 
-func (s *Server) handleGetAllTeams(w http.ResponseWriter, r *http.Request) {
-	teams, err := s.store.GetTeams()
+func (server *Server) handleGetAllTeams(w http.ResponseWriter, r *http.Request) {
+	teams, err := server.store.GetTeams()
 	if err != nil {
-		http.Error(w, "Invalid login credentials"+err.Error(), http.StatusUnauthorized)
+		http.Error(w, "Invalid login credentials "+err.Error(), http.StatusUnauthorized)
 		return
 	}
 
 	json.NewEncoder(w).Encode(map[string][]model.TeamDTO{"teams": teams})
 }
 
-func (s *Server) handleGetTeam(w http.ResponseWriter, r *http.Request) {
+func (server *Server) handleGetTeam(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	idStr := vars["id"]
 
@@ -31,7 +32,7 @@ func (s *Server) handleGetTeam(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	team, err := s.store.GetTeam(*id)
+	team, err := server.store.GetTeam(*id)
 	if err != nil {
 		fmt.Println(err)
 		http.Error(w, "Invalid login credentials "+err.Error(), http.StatusUnauthorized)
@@ -45,7 +46,7 @@ func (s *Server) handleGetTeam(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]model.TeamDTO{"team": *team})
 }
 
-func (s *Server) handleTeamCreation(w http.ResponseWriter, r *http.Request) {
+func (server *Server) handleTeamCreation(w http.ResponseWriter, r *http.Request) {
 
 	var team model.Team
 	err := json.NewDecoder(r.Body).Decode(&team)
@@ -61,7 +62,7 @@ func (s *Server) handleTeamCreation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = s.store.CreateTeam(r.Context(), &team)
+	err = server.store.CreateTeam(r.Context(), &team)
 	if err != nil {
 		http.Error(w, "Error while creating a team: "+err.Error(), http.StatusInternalServerError)
 		return

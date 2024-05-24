@@ -1,14 +1,25 @@
 package api
 
 import (
+	"compress/gzip"
 	"net/http"
+	"strings"
 	"tournament_api/server/utils"
 )
+
+type GzipResponseWriter struct {
+	http.ResponseWriter
+	Writer *gzip.Writer
+}
+
+func (writer *GzipResponseWriter) Write(b []byte) (int, error) {
+	return writer.Writer.Write(b)
+}
 
 const API_KEY = "X-Api-Key"
 const EXPECTED_API_KEY = "tournament"
 
-func (s *Server) HeadersMiddleware(next http.Handler) http.Handler {
+func (server *Server) HeadersMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 
@@ -29,7 +40,23 @@ func (s *Server) HeadersMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-func (s *Server) AuthenticateMiddleware(next http.Handler) http.Handler {
+func GzipMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+		if !strings.Contains(request.Header.Get("Accept-Encoding"), "gzip") {
+			next.ServeHTTP(writer, request)
+			return
+		}
+
+		writer.Header().Set("Content-Encoding", "gzip")
+		gz := gzip.NewWriter(writer)
+		defer gz.Close()
+
+		gzrw := &GzipResponseWriter{ResponseWriter: writer, Writer: gz}
+		next.ServeHTTP(gzrw, request)
+	})
+}
+
+func (server *Server) AuthenticateMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		accessTokenString, accessTokenErr := r.Cookie(ACCESS_TOKEN)
 		refreshTokenString, refreshTokenErr := r.Cookie(REFRESH_TOKEN)
@@ -44,8 +71,8 @@ func (s *Server) AuthenticateMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		accessToken := s.newAccessToken()
-		refreshToken := s.newRefreshToken()
+		accessToken := server.newAccessToken()
+		refreshToken := server.newRefreshToken()
 
 		if _, err := accessToken.verifyToken(accessTokenString.Value); err != nil {
 			http.Error(w, "Invalid access token", http.StatusUnauthorized)
@@ -61,7 +88,7 @@ func (s *Server) AuthenticateMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-func (s *Server) TokenRefreshMiddleware(next http.Handler) http.Handler {
+func (server *Server) TokenRefreshMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		accessTokenString, accessTokenErr := r.Cookie(ACCESS_TOKEN)
 		refreshTokenString, refreshTokenErr := r.Cookie(REFRESH_TOKEN)
@@ -71,7 +98,7 @@ func (s *Server) TokenRefreshMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		refreshToken := s.newRefreshToken()
+		refreshToken := server.newRefreshToken()
 
 		refreshTokenClaims, refErr := refreshToken.verifyToken(refreshTokenString.Value)
 		if refErr != nil {
@@ -80,7 +107,7 @@ func (s *Server) TokenRefreshMiddleware(next http.Handler) http.Handler {
 		}
 
 		if accessTokenString == nil || accessTokenErr == http.ErrNoCookie {
-			newAccessToken := s.newAccessToken()
+			newAccessToken := server.newAccessToken()
 
 			email := refreshTokenClaims.Email
 
@@ -96,7 +123,7 @@ func (s *Server) TokenRefreshMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-func (s *Server) APIKeyMiddleware(next http.Handler) http.Handler {
+func (server *Server) APIKeyMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		apiKey := r.Header.Get(API_KEY)
 
@@ -109,7 +136,7 @@ func (s *Server) APIKeyMiddleware(next http.Handler) http.Handler {
 }
 
 // this will only run on development
-func (s *Server) CORSMiddleware(next http.Handler) http.Handler {
+func (server *Server) CORSMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS")

@@ -12,7 +12,7 @@ func (store *SQLStore) GetTeams() ([]model.TeamDTO, error) {
 		return fmt.Errorf("GetTeams: %v", err)
 	}
 
-	stmt, err := store.DB.Prepare("SELECT teams.id, categories.id, cities.id, teams.name, teams.email, teams.phone FROM teams, categories, cities WHERE teams.categories_id = categories.id AND teams.cities_id = cities.id")
+	stmt, err := store.DB.Prepare("SELECT teams.id, categories.id, categories.name, categories.gender, cities.id, cities.name, cities.state, teams.name, teams.email, teams.phone FROM teams, categories, cities WHERE teams.categories_id = categories.id AND teams.cities_id = cities.id")
 	if err != nil {
 		return nil, fail(fmt.Errorf("preparing statement: %v", err))
 	}
@@ -31,8 +31,12 @@ func (store *SQLStore) GetTeams() ([]model.TeamDTO, error) {
 
 		if err := rows.Scan(
 			&team.ID,
-			&team.CategoryID,
-			&team.CityID,
+			&team.Category.ID,
+			&team.Category.Name,
+			&team.Category.Gender,
+			&team.City.ID,
+			&team.City.Name,
+			&team.City.State,
 			&team.Name,
 			&team.Email,
 			&team.Phone,
@@ -57,10 +61,10 @@ func (store *SQLStore) GetTeam(id uint64) (*model.TeamDTO, error) {
 
 	var team model.TeamDTO
 
-	err := store.DB.QueryRow("SELECT teams.id, categories.id, cities.id, teams.name, teams.email, teams.phone FROM teams, categories, cities WHERE teams.categories_id = categories.id AND teams.cities_id = cities.id AND teams.id = $1", id).Scan(
+	err := store.DB.QueryRow("SELECT teams.id, teams.categories_id, teams.cities_id, teams.name, teams.email, teams.phone FROM teams WHERE teams.id = $1", id).Scan(
 		&team.ID,
-		&team.CategoryID,
-		&team.CityID,
+		&team.Category.ID,
+		&team.City.ID,
 		&team.Name,
 		&team.Email,
 		&team.Phone,

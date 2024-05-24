@@ -1,6 +1,7 @@
 package types
 
 type AppConfig struct {
+	COMPRESS                          bool
 	DB_USER                           string
 	DB_PASSWORD                       string
 	DB_HOST                           string

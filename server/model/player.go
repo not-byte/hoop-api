@@ -6,10 +6,12 @@ import (
 
 type PlayerDTO struct {
 	ID        uint64    `json:"id"`
+	TeamsID   uint64    `json:"teams_id"`
 	FirstName string    `json:"first_name"`
 	LastName  string    `json:"last_name"`
 	Age       int8      `json:"age"`
 	Birthday  time.Time `json:"birthday"`
+	Gender    string    `json:"gender"`
 	Number    int       `json:"number"`
 	Height    int       `json:"height"`
 	Weight    int       `json:"weight"`

@@ -12,14 +12,15 @@ func LoadConfig() (*types.AppConfig, error) {
 	godotenv.Load()
 
 	config := &types.AppConfig{
-		PRODUCTION:                        getEnvAsBool("PRODUCTION", false),
-		PUBLIC_HOST:                       getEnv("PUBLIC_HOST", "http://127.0.0.1"),
-		PORT:                              getEnv("PORT", ":3000"),
+		COMPRESS:                          getEnvAsBool("COMPRESS", true),
 		DB_USER:                           getEnv("DB_USER", "root"),
 		DB_PASSWORD:                       getEnv("DB_PASSWORD", ""),
 		DB_HOST:                           getEnv("DB_HOST", "eu2.notbyte.com"),
 		DB_PORT:                           getEnv("DB_PORT", "60009"),
 		DB_NAME:                           getEnv("DB_NAME", "tournament_dev"),
+		PRODUCTION:                        getEnvAsBool("PRODUCTION", false),
+		PUBLIC_HOST:                       getEnv("PUBLIC_HOST", "http://127.0.0.1"),
+		PORT:                              getEnv("PORT", ":3000"),
 		JWT_ACCESS_SECRET:                 getEnv("JWT_ACCESS_SECRET", "not-so-secret-now-is-it?"),
 		JWT_REFRESH_SECRET:                getEnv("JWT_REFRESH_SECRET", "not-so-secret-now-is-it?"),
 		JWT_ACCESS_EXPIRATION_IN_SECONDS:  getEnvAsInt("JWT_ACCESS_EXPIRATION_IN_SECONDS", 600),         //10 minutes

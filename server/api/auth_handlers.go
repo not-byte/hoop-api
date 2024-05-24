@@ -17,15 +17,15 @@ type AuthHandlers struct {
 	store interface{}
 }
 
-func (s *Server) authHandlers() *AuthHandlers {
+func (server *Server) authHandlers() *AuthHandlers {
 	return &AuthHandlers{
-		store: s.store,
+		store: server.store,
 	}
 }
 */
 
-func (s *Server) handleGetAll(w http.ResponseWriter, r *http.Request) {
-	account, err := s.store.GetAccountByEmail("pawellinek2@gmail.com")
+func (server *Server) handleGetAll(w http.ResponseWriter, r *http.Request) {
+	account, err := server.store.GetAccountByEmail("pawellinek2@gmail.com")
 	if err != nil {
 		http.Error(w, "Invalid login credentials "+err.Error(), http.StatusUnauthorized)
 		return
@@ -38,7 +38,7 @@ func (s *Server) handleGetAll(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(*account)
 }
 
-func (s *Server) handleLogin(w http.ResponseWriter, r *http.Request) {
+func (server *Server) handleLogin(w http.ResponseWriter, r *http.Request) {
 
 	var user model.Account
 	errDecode := json.NewDecoder(r.Body).Decode(&user)
@@ -54,7 +54,7 @@ func (s *Server) handleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	account, err := s.store.GetAccountByEmail(user.Email)
+	account, err := server.store.GetAccountByEmail(user.Email)
 	if err != nil {
 		http.Error(w, "Error searching for account", http.StatusInternalServerError)
 		return
@@ -70,8 +70,8 @@ func (s *Server) handleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	accessToken := s.newAccessToken()
-	refreshToken := s.newRefreshToken()
+	accessToken := server.newAccessToken()
+	refreshToken := server.newRefreshToken()
 
 	accessTokenString, errAccess := accessToken.generateTokenString(&user.Email)
 	refreshTokenString, errRefresh := refreshToken.generateTokenString(&user.Email)
@@ -90,7 +90,7 @@ func (s *Server) handleLogin(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (s *Server) handleRegister(w http.ResponseWriter, r *http.Request) {
+func (server *Server) handleRegister(w http.ResponseWriter, r *http.Request) {
 
 	var user types.User
 	errDecode := json.NewDecoder(r.Body).Decode(&user)
@@ -106,7 +106,7 @@ func (s *Server) handleRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	account, err := s.store.GetAccountByEmail(*user.Email)
+	account, err := server.store.GetAccountByEmail(*user.Email)
 	if account != nil {
 		http.Error(w, "Account alredy exists "+err.Error(), http.StatusBadRequest)
 		return
@@ -122,14 +122,14 @@ func (s *Server) handleRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = s.store.CreateAccount(r.Context(), *user.Email, hashedPassword, 9)
+	err = server.store.CreateAccount(r.Context(), *user.Email, hashedPassword, 9)
 	if err != nil {
 		http.Error(w, "Error while creating account", http.StatusInternalServerError)
 		return
 	}
 
-	accessToken := s.newAccessToken()
-	refreshToken := s.newRefreshToken()
+	accessToken := server.newAccessToken()
+	refreshToken := server.newRefreshToken()
 
 	accessTokenString, errAccess := accessToken.generateTokenString(user.Email)
 	refreshTokenString, errRefresh := refreshToken.generateTokenString(user.Email)

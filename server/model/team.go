@@ -5,12 +5,12 @@ import (
 )
 
 type TeamDTO struct {
-	ID         uint64 `json:"id"`
-	CategoryID uint64 `json:"category_id"`
-	CityID     uint64 `json:"city_id"`
-	Name       string `json:"name"`
-	Email      string `json:"email"`
-	Phone      string `json:"phone"`
+	ID       uint64      `json:"id"`
+	Category CategoryDTO `json:"category"`
+	City     CityDTO     `json:"city"`
+	Name     string      `json:"name"`
+	Email    string      `json:"email"`
+	Phone    string      `json:"phone"`
 }
 
 type Team struct {

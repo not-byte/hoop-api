@@ -24,20 +24,20 @@ type AuthToken struct {
 	duration time.Time
 }
 
-func (s *Server) newAccessToken() (t *AuthToken) {
+func (server *Server) newAccessToken() (t *AuthToken) {
 	accessToken := &AuthToken{
 		name:     ACCESS_TOKEN,
-		key:      []byte(s.config.JWT_ACCESS_SECRET),
-		duration: time.Now().Add(time.Second * time.Duration(s.config.JWT_ACCESS_EXPIRATION_IN_SECONDS)),
+		key:      []byte(server.config.JWT_ACCESS_SECRET),
+		duration: time.Now().Add(time.Second * time.Duration(server.config.JWT_ACCESS_EXPIRATION_IN_SECONDS)),
 	}
 	return accessToken
 }
 
-func (s *Server) newRefreshToken() (t *AuthToken) {
+func (server *Server) newRefreshToken() (t *AuthToken) {
 	refreshToken := &AuthToken{
 		name:     REFRESH_TOKEN,
-		key:      []byte(s.config.JWT_REFRESH_SECRET),
-		duration: time.Now().Add(time.Second * time.Duration(s.config.JWT_REFRESH_EXPIRATION_IN_SECONDS)),
+		key:      []byte(server.config.JWT_REFRESH_SECRET),
+		duration: time.Now().Add(time.Second * time.Duration(server.config.JWT_REFRESH_EXPIRATION_IN_SECONDS)),
 	}
 	return refreshToken
 }
