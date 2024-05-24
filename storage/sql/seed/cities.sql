@@ -1,3 +1,5 @@
+BEGIN;
+
 INSERT INTO cities (name, state) VALUES
     ('Bielsko-Biała', 'Silesian'),
     ('Bieruń', 'Silesian'),
@@ -71,3 +73,5 @@ INSERT INTO cities (name, state) VALUES
     ('Żory', 'Silesian'),
     ('Żywiec', 'Silesian')
     ON CONFLICT DO NOTHING;
+
+COMMIT;
